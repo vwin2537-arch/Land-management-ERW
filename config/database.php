@@ -4,12 +4,12 @@
  * ระบบจัดการที่ดินทำกินในเขตอุทยานแห่งชาติ
  */
 
-// ใช้ค่าจาก Environment Variables (ถ้ามี) สำหรับ Cloud Deployment
-define('DB_HOST',    getenv('DB_HOST')     ?: '127.0.0.1');
-define('DB_NAME',    getenv('DB_NAME')     ?: 'land_management');
-define('DB_USER',    getenv('DB_USER')     ?: 'root');
-define('DB_PASS',    getenv('DB_PASS')     !== false ? getenv('DB_PASS') : '');
-define('DB_CHARSET', getenv('DB_CHARSET')  ?: 'utf8mb4');
+// ใช้ค่าจาก Environment Variables (รองรับทั้ง DB_* และ MYSQL* สำหรับ Cloud/Railway)
+define('DB_HOST',    getenv('DB_HOST') ?: getenv('MYSQLHOST') ?: getenv('MYSQL_HOST') ?: '127.0.0.1');
+define('DB_NAME',    getenv('DB_NAME') ?: getenv('MYSQLDATABASE') ?: 'land_management');
+define('DB_USER',    getenv('DB_USER') ?: getenv('MYSQLUSER') ?: 'root');
+define('DB_PASS',    getenv('DB_PASS') !== false ? getenv('DB_PASS') : (getenv('MYSQLPASSWORD') !== false ? getenv('MYSQLPASSWORD') : ''));
+define('DB_CHARSET', getenv('DB_CHARSET') ?: 'utf8mb4');
 
 /**
  * Get PDO Connection
@@ -19,7 +19,7 @@ function getDB(): PDO {
     static $pdo = null;
     
     if ($pdo === null) {
-        $port = getenv('DB_PORT') ?: '3306';
+        $port = getenv('DB_PORT') ?: getenv('MYSQLPORT') ?: '3306';
         $dsn = "mysql:host=" . DB_HOST . ";port=" . $port . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
         
         $options = [
