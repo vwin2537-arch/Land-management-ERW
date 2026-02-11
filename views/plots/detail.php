@@ -68,7 +68,7 @@ $statusColor = PLOT_STATUS_COLORS[$p['status']] ?? '#6b7280';
     </div>
 </div>
 
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+<div class="plot-detail-grid">
     <!-- Left: ข้อมูลแปลง -->
     <div class="card">
         <div class="card-header">
@@ -89,12 +89,14 @@ $statusColor = PLOT_STATUS_COLORS[$p['status']] ?? '#6b7280';
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding:8px 0;color:var(--gray-500);">พื้นที่</td>
-                    <td><strong>
-                            <?= $p['area_rai'] ?> ไร่
-                            <?= $p['area_ngan'] ?> งาน
-                            <?= $p['area_sqwa'] ?> ตร.วา
-                        </strong></td>
+                    <td style="padding:8px 0;color:var(--gray-500);vertical-align:top;">พื้นที่</td>
+                    <td>
+                        <div style="font-weight:600; display:flex; flex-wrap:wrap; gap:8px;">
+                            <span><?= $p['area_rai'] ?> ไร่</span>
+                            <span><?= $p['area_ngan'] ?> งาน</span>
+                            <span><?= $p['area_sqwa'] ?> ตร.วา</span>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td style="padding:8px 0;color:var(--gray-500);">ประเภทการใช้</td>

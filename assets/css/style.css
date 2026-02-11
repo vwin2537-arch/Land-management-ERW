@@ -1171,3 +1171,15 @@ input[type="file"].form-control {
         min-height: 200px;
     }
 }
+
+.plot-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .plot-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
