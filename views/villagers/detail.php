@@ -134,6 +134,24 @@ $v = $villager;
                     <?= count($plots) ?> แปลง
                 </span>
             </h3>
+            <?php
+            // Calculate Total Area
+            $sumRai = 0; $sumNgan = 0; $sumSqWa = 0;
+            foreach ($plots as $p) {
+                $sumRai += $p['area_rai'];
+                $sumNgan += $p['area_ngan'];
+                $sumSqWa += $p['area_sqwa'];
+            }
+            $sumNgan += floor($sumSqWa / 100);
+            $sumSqWa = fmod($sumSqWa, 100);
+            $sumRai += floor($sumNgan / 4);
+            $sumNgan = $sumNgan % 4;
+            ?>
+            <div style="font-size:14px; color:var(--gray-600); margin-top:4px;">
+                รวมพื้นที่: <strong style="color:var(--primary-700);"><?= number_format($sumRai) ?></strong> ไร่ 
+                <strong><?= $sumNgan ?></strong> งาน 
+                <strong><?= number_format($sumSqWa, 1) ?></strong> ตร.วา
+            </div>
         </div>
         <div class="card-body" style="padding:0;">
             <?php if (empty($plots)): ?>
