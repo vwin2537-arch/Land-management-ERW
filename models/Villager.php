@@ -9,9 +9,9 @@ class Villager
 {
 
     /**
-     * Get all villagers (with optional search)
+     * Get all villagers (with optional search and sorting)
      */
-    public static function getAll(string $search = '', int $limit = 20, int $offset = 0): array
+    public static function getAll(string $search = '', string $sortBy = 'recent', int $limit = 20, int $offset = 0): array
     {
         $db = getDB();
         $where = '';
@@ -22,9 +22,18 @@ class Villager
             $params = ['s1' => "%$search%", 's2' => "%$search%", 's3' => "%$search%", 's4' => "%$search%"];
         }
 
+        // Determine sort order
+        $orderBy = match ($sortBy) {
+            'name_asc' => 'v.first_name ASC, v.last_name ASC',
+            'plots_desc' => 'plot_count DESC',
+            'area_desc' => 'total_area_rai DESC',
+            default => 'v.created_at DESC'
+        };
+
         $stmt = $db->prepare("SELECT v.*, 
-                              (SELECT COUNT(*) FROM land_plots lp WHERE lp.villager_id = v.villager_id) as plot_count
-                              FROM villagers v $where ORDER BY v.created_at DESC LIMIT $limit OFFSET $offset");
+                              (SELECT COUNT(*) FROM land_plots lp WHERE lp.villager_id = v.villager_id) as plot_count,
+                              (SELECT COALESCE(SUM(area_rai + area_ngan/4 + area_sqwa/400), 0) FROM land_plots lp WHERE lp.villager_id = v.villager_id) as total_area_rai
+                              FROM villagers v $where ORDER BY $orderBy LIMIT $limit OFFSET $offset");
         $stmt->execute($params);
         return $stmt->fetchAll();
     }

@@ -24,15 +24,8 @@ $totalItems = $countStmt->fetchColumn();
 $totalPages = max(1, ceil($totalItems / ITEMS_PER_PAGE));
 
 // Fetch data
-$sql = "SELECT v.*, 
-               (SELECT COUNT(*) FROM land_plots lp WHERE lp.villager_id = v.villager_id) as plot_count
-        FROM villagers v 
-        $where 
-        ORDER BY v.created_at DESC 
-        LIMIT " . ITEMS_PER_PAGE . " OFFSET $offset";
-$stmt = $db->prepare($sql);
-$stmt->execute($params);
-$villagers = $stmt->fetchAll();
+$sortBy = $_GET['sort'] ?? 'recent';
+$villagers = Villager::getAll($search, $sortBy, ITEMS_PER_PAGE, $offset);
 ?>
 
 <!-- Page Header -->
@@ -51,18 +44,26 @@ $villagers = $stmt->fetchAll();
     </div>
 </div>
 
-<!-- Search -->
+<!-- Search & Sort -->
 <div class="card mb-3">
     <div class="card-body" style="padding: 16px 20px;">
-        <form method="GET" class="d-flex gap-1 align-center">
+        <form method="GET" class="d-flex gap-1 align-center wrap-mobile">
             <input type="hidden" name="page" value="villagers">
-            <div class="search-bar" style="flex:1; max-width:100%;">
+            <div class="search-bar" style="flex:1;">
                 <i class="bi bi-search"></i>
-                <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" data-live-search="true"
+                <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" 
                     placeholder="ค้นหาด้วย เลขบัตร ปชช. / ชื่อ / นามสกุล / หมู่บ้าน...">
             </div>
+            
+            <select name="sort" class="form-control" style="width:auto; min-width:150px;" onchange="this.form.submit()">
+                <option value="recent" <?= $sortBy == 'recent' ? 'selected' : '' ?>>ล่าสุด</option>
+                <option value="name_asc" <?= $sortBy == 'name_asc' ? 'selected' : '' ?>>ชื่อ (ก-ฮ)</option>
+                <option value="plots_desc" <?= $sortBy == 'plots_desc' ? 'selected' : '' ?>>จำนวนแปลง (มากสุด)</option>
+                <option value="area_desc" <?= $sortBy == 'area_desc' ? 'selected' : '' ?>>เนื้อที่ (มากสุด)</option>
+            </select>
+
             <button type="submit" class="btn btn-primary btn-sm">ค้นหา</button>
-            <?php if ($search): ?>
+            <?php if ($search || $sortBy !== 'recent'): ?>
                 <a href="index.php?page=villagers" class="btn btn-secondary btn-sm">ล้าง</a>
             <?php endif; ?>
         </form>
