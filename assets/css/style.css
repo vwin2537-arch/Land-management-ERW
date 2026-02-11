@@ -1178,8 +1178,16 @@ input[type="file"].form-control {
     gap: 20px;
 }
 
+.villager-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
 @media (max-width: 768px) {
-    .plot-detail-grid {
+
+    .plot-detail-grid,
+    .villager-detail-grid {
         grid-template-columns: 1fr;
     }
 }

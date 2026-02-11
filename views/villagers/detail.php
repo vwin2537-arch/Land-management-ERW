@@ -41,7 +41,7 @@ $v = $villager;
     </div>
 </div>
 
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+<div class="villager-detail-grid">
     <!-- Left: ข้อมูลส่วนตัว -->
     <div class="card">
         <div class="card-header">
