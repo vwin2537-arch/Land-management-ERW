@@ -80,7 +80,7 @@ $c = $case;
     </div>
 </div>
 
-<div class="case-detail-grid">
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
     <!-- Left: Details -->
     <div class="card">
         <div class="card-header">

@@ -43,7 +43,6 @@ class AuthController
                 // Log activity
                 $this->logActivity($user['user_id'], 'login', 'users', $user['user_id'], 'เข้าสู่ระบบ');
 
-                session_write_close(); // Prevent session lock
                 header('Location: index.php?page=dashboard');
                 exit;
             } else {
