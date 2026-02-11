@@ -13,45 +13,81 @@ try {
     $db = getDB();
     echo "Connected to database: " . DB_NAME . "<br>";
     
+    // Disable foreign key checks first
+    $db->exec("SET FOREIGN_KEY_CHECKS=0");
+    $db->exec("SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO'");
+    $db->exec("SET NAMES utf8mb4");
+    echo "Foreign key checks disabled.<br>";
+    
     // Read the SQL file
     $sql = file_get_contents($file);
     
-    // Remove comments
-    $sql = preg_replace('/--.*?\n/', '', $sql);
-    $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
+    // Normalize line endings
+    $sql = str_replace("\r\n", "\n", $sql);
+    $sql = str_replace("\r", "\n", $sql);
     
-    // Split into individual queries (basic split by ;)
-    // Note: This is a simple split, might fail if ; is inside strings, 
-    // but usually okay for standard exports.
-    $queries = explode(";\n", $sql);
+    // Remove only plain comments (lines starting with --)
+    $sql = preg_replace('/^--.*$/m', '', $sql);
+    
+    // Split into individual statements by semicolon followed by newline
+    $statements = explode(";\n", $sql);
     
     $count = 0;
     $errors = 0;
+    $errorMessages = [];
     
-    echo "Starting migration...<br>";
+    echo "Starting migration (" . count($statements) . " statements found)...<br>";
     
-    foreach ($queries as $query) {
-        $query = trim($query);
-        if (empty($query)) continue;
+    foreach ($statements as $statement) {
+        $statement = trim($statement);
+        if (empty($statement)) continue;
         
         try {
-            $db->exec($query);
+            $db->exec($statement);
             $count++;
         } catch (PDOException $e) {
             $errors++;
-            echo "<small style='color:orange;'>Warning at query $count: " . substr($e->getMessage(), 0, 100) . "...</small><br>";
+            $msg = $e->getMessage();
+            $errorMessages[] = "<small style='color:orange;'>⚠️ Query #$count: " . htmlspecialchars(substr($msg, 0, 150)) . "</small>";
         }
     }
     
+    // Re-enable foreign key checks
+    $db->exec("SET FOREIGN_KEY_CHECKS=1");
+    
     echo "<h3>Migration Finished</h3>";
-    echo "✅ Successfully executed $count queries.<br>";
+    echo "✅ Successfully executed <strong>$count</strong> queries.<br>";
+    
     if ($errors > 0) {
-        echo "⚠️ Encountered $errors non-critical warnings (usually tables already existing or minor syntax differences).<br>";
+        echo "⚠️ Encountered <strong>$errors</strong> warnings.<br>";
+        echo "<details><summary>Click to see warnings</summary>";
+        foreach ($errorMessages as $msg) {
+            echo $msg . "<br>";
+        }
+        echo "</details>";
     }
     
-    echo "<br><a href='index.php?page=login'>Go to Login Page</a>";
+    // Verify tables
+    echo "<h3>Verification</h3>";
+    $stmt = $db->query("SHOW TABLES");
+    $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+    if (count($tables) > 0) {
+        echo "✅ Found <strong>" . count($tables) . "</strong> tables:<br>";
+        echo "<ul>";
+        foreach ($tables as $table) {
+            $countStmt = $db->query("SELECT COUNT(*) FROM `$table`");
+            $rowCount = $countStmt->fetchColumn();
+            echo "<li><strong>$table</strong> ($rowCount rows)</li>";
+        }
+        echo "</ul>";
+    } else {
+        echo "❌ No tables found! Migration may have failed.<br>";
+    }
+    
+    echo "<br><a href='index.php?page=login'>👉 Go to Login Page</a>";
 
 } catch (Exception $e) {
     echo "<h3 style='color:red;'>❌ Migration Failed</h3>";
-    echo "<pre>" . $e->getMessage() . "</pre>";
+    echo "<pre>" . htmlspecialchars($e->getMessage()) . "</pre>";
 }
