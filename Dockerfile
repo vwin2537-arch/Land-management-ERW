@@ -14,8 +14,5 @@ RUN mkdir -p /var/www/html/uploads/photos \
     && chown -R www-data:www-data /var/www/html/uploads \
     && chmod -R 755 /var/www/html/uploads
 
-# Railway uses PORT env variable
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
-
-EXPOSE ${PORT}
-CMD ["apache2-foreground"]
+# Railway sets PORT at runtime, so we configure Apache at startup
+CMD sed -i "s/80/${PORT:-80}/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && apache2-foreground
