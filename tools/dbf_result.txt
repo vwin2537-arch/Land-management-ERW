@@ -1,0 +1,161 @@
+=== DBF Info ===
+Records: 1179
+Header: 1217 bytes | Record: 1260 bytes
+
+#   Name           Type  Len   Dec   
+-------------------------------------
+1   NAME_TITLE     C     50    0     
+2   NAME           C     50    0     
+3   SURNAME        C     50    0     
+4   IDCARD         C     50    0     
+5   RAI            N     14    3     
+6   NGAN           N     14    3     
+7   NUM_SPAR       C     50    0     
+8   NAME_DNP_T     C     50    0     
+9   NAME_DNP       C     100   0     
+10  CODE_DNP       N     5     0     
+11  APAR_CODE      C     20    0     
+12  APAR_NO        C     10    0     
+13  NUM_APAR       C     20    0     
+14  SPAR_CODE      C     20    0     
+15  SPAR_NO        C     10    0     
+16  E              N     19    11    
+17  N              N     19    11    
+18  PAR_BAN        C     50    0     
+19  BAN_E          C     3     0     
+20  PAR_MOO        C     5     0     
+21  PAR_TAM        C     50    0     
+22  PAR_AMP        C     50    0     
+23  PAR_PROV       C     50    0     
+24  HOME_NO        C     10    0     
+25  HOME_BAN       C     50    0     
+26  HOME_MOO       C     5     0     
+27  HOME_TAM       C     50    0     
+28  HOME_AMP       C     50    0     
+29  HOME_PROV      C     50    0     
+30  PERIMETER      N     19    11    
+31  AREA_RAI       N     19    11    
+32  WA_SQ          N     19    11    
+33  REMARK         C     100   0     
+34  BAN_TYPE       N     5     0     
+35  YEAR           C     4     0     
+36  TARGET_FID     N     19    11    
+37  PTYPE          C     100   0     
+
+Total: 37 fields
+
+=== Sample (3 records) ===
+
+--- Record 1 ---
+  NAME_TITLE: นาย
+  NAME: ไมตรี
+  SURNAME: ไวยิ่งยุทธ
+  IDCARD: 3710400085044
+  RAI: 2.000
+  NGAN: 3.000
+  NUM_SPAR: 00001
+  NAME_DNP_T: อุทยานแห่งชาติ
+  NAME_DNP: เอราวัณ
+  CODE_DNP: 1012
+  APAR_NO: 10019
+  NUM_APAR: 20001
+  SPAR_CODE: BKR10120000100001
+  SPAR_NO: 00001
+  E: 507513.74327899591
+  N: 1595575.79904291197
+  PAR_BAN: เขาแก่งเรียง
+  BAN_E: BKR
+  PAR_MOO: 3
+  PAR_TAM: ท่ากระดาน
+  PAR_AMP: ศรีสวัสดิ์
+  PAR_PROV: กาญจนบุรี
+  HOME_NO: 19/1
+  HOME_BAN: ท่ากระดาน
+  HOME_MOO: 1
+  HOME_TAM: ท่ากระดาน
+  HOME_AMP: ศรีสวัสดิ์
+  HOME_PROV: กาญจนบุรี
+  PERIMETER: 4689.25296543779
+  AREA_RAI: 2.00000000000
+  WA_SQ: 72.31324135945
+  REMARK: ไม่ล่อแหลม
+  BAN_TYPE: 1
+  YEAR: 2567
+  TARGET_FID: 0.00000000000
+  PTYPE: ที่อยู่อาศัยและที่ทำกิน
+
+--- Record 2 ---
+  NAME_TITLE: นาง
+  NAME: ณัฐณิชา
+  SURNAME: มิตรสายชล
+  IDCARD: 3101501948036
+  RAI: 12.000
+  NGAN: 1.000
+  NUM_SPAR: 00001
+  NAME_DNP_T: อุทยานแห่งชาติ
+  NAME_DNP: เอราวัณ
+  CODE_DNP: 1012
+  APAR_NO: 10020
+  NUM_APAR: 10001
+  SPAR_CODE: BKR10120000200001
+  SPAR_NO: 00002
+  E: 507627.37213822437
+  N: 1595428.04257742316
+  PAR_BAN: เขาแก่งเรียง
+  BAN_E: BKR
+  PAR_MOO: 3
+  PAR_TAM: ท่ากระดาน
+  PAR_AMP: ศรีสวัสดิ์
+  PAR_PROV: กาญจนบุรี
+  HOME_NO: 1008
+  HOME_BAN: ซ.ริมคลองบางกอกให
+  HOME_MOO: -
+  HOME_TAM: แขวงวัดท่าพระ
+  HOME_AMP: เขตบางกอกใหญ่
+  HOME_PROV: กรุงเทพมหานคร
+  PERIMETER: 19834.89334834013
+  AREA_RAI: 12.00000000000
+  WA_SQ: 58.72333708503
+  REMARK: ไม่ล่อแหลม
+  BAN_TYPE: 1
+  YEAR: 2567
+  TARGET_FID: 0.00000000000
+  PTYPE: ที่อยู่อาศัยและที่ทำกิน
+
+--- Record 3 ---
+  NAME_TITLE: นางสาว
+  NAME: สุภาวินี
+  SURNAME: พรมศร
+  IDCARD: 3710400101228
+  RAI: 3.000
+  NGAN: 0.000
+  NUM_SPAR: 00001
+  NAME_DNP_T: อุทยานแห่งชาติ
+  NAME_DNP: เอราวัณ
+  CODE_DNP: 1012
+  APAR_NO: 10021
+  NUM_APAR: 20001
+  SPAR_CODE: BKR10120000300001
+  SPAR_NO: 00003
+  E: 508132.27741716721
+  N: 1594751.23901191703
+  PAR_BAN: เขาแก่งเรียง
+  BAN_E: BKR
+  PAR_MOO: 3
+  PAR_TAM: ท่ากระดาน
+  PAR_AMP: ศรีสวัสดิ์
+  PAR_PROV: กาญจนบุรี
+  HOME_NO: 8/1
+  HOME_BAN: เขาแก่งเรียง
+  HOME_MOO: 3
+  HOME_TAM: ท่ากระดาน
+  HOME_AMP: ศรีสวัสดิ์
+  HOME_PROV: กาญจนบุรี
+  PERIMETER: 4856.00301030907
+  AREA_RAI: 3.00000000000
+  WA_SQ: 14.00075257727
+  REMARK: ไม่ล่อแหลม
+  BAN_TYPE: 1
+  YEAR: 2567
+  TARGET_FID: 0.00000000000
+  PTYPE: ที่อยู่อาศัยและที่ทำกิน

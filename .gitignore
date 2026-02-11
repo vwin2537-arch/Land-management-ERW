@@ -1,0 +1,18 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# XAMPP / Local dev files
+/nbproject/
+/logs/
+/tmp/
+
+# Backup files (Important: Keep the schema/migration, but maybe ignore huge data dumps if needed)
+# However, user wants to deploy to cloud, so we might need the backup.sql.
+# Let's keep the .sql file for now as it's needed for initial setup.
+
+# Antigravity artifacts (if any are in project dir)
+.gemini/
+.agent/
+brain/
+*.log
