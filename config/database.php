@@ -15,14 +15,16 @@ function get_config($key, $default = null) {
 }
 
 // 1. ลองดึงจาก MYSQL_URL (Railway)
+// 1. ลองดึงจาก MYSQL_URL (Railway)
 $mysql_url = get_config('MYSQL_URL') ?: get_config('MYSQLDATABASE_URL');
-if ($mysql_url) {
-    $p = parse_url($mysql_url);
+$p = $mysql_url ? parse_url($mysql_url) : null;
+
+if ($p && is_array($p)) {
     define('DB_HOST', $p['host'] ?? '127.0.0.1');
     define('DB_PORT', $p['port'] ?? '3306');
     define('DB_USER', $p['user'] ?? 'root');
     define('DB_PASS', $p['pass'] ?? '');
-    define('DB_NAME', ltrim($p['path'], '/'));
+    define('DB_NAME', ltrim($p['path'] ?? 'land_management', '/'));
 } else {
     // 2. ถ้าไม่มี MYSQL_URL ให้ไล่เช็คทีละตัว
     define('DB_HOST',    get_config('DB_HOST') ?: get_config('MYSQLHOST') ?: get_config('MYSQL_HOST') ?: '127.0.0.1');

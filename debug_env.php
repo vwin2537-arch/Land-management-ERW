@@ -4,6 +4,9 @@
  * DELETE THIS FILE AFTER DEBUGGING
  */
 header('Content-Type: application/json');
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 $vars = [
     'MYSQL_URL', 'MYSQLDATABASE_URL', 'DATABASE_URL',
