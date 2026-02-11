@@ -1,7 +1,9 @@
 FROM php:8.2-apache
 
 RUN docker-php-ext-install pdo pdo_mysql mysqli
-RUN a2enmod rewrite
+
+# Fix MPM conflict: use prefork (required for mod_php)
+RUN a2dismod mpm_event && a2enmod mpm_prefork && a2enmod rewrite
 
 # Allow .htaccess overrides
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
