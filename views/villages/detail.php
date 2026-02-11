@@ -4,10 +4,10 @@
  */
 
 $db = getDB();
-$ban_e = $_GET['ban_e'] ?? '';
+$name = $_GET['name'] ?? '';
 
-if (empty($ban_e)) {
-    echo '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ไม่ระบุรหัสหมู่บ้าน</div>';
+if (empty($name)) {
+    echo '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ไม่ระบุชื่อหมู่บ้าน</div>';
     return;
 }
 
@@ -21,12 +21,12 @@ $summaryStmt = $db->prepare("SELECT
     SUM(CASE WHEN status = 'pending_review' THEN 1 ELSE 0 END) as pending_count,
     SUM(CASE WHEN data_issues IS NOT NULL AND data_issues != '' THEN 1 ELSE 0 END) as issues_count,
     ROUND(SUM(perimeter), 2) as total_perimeter
-FROM land_plots WHERE ban_e = :ban_e GROUP BY ban_e");
-$summaryStmt->execute(['ban_e' => $ban_e]);
+FROM land_plots WHERE par_ban = :name GROUP BY par_ban");
+$summaryStmt->execute(['name' => $name]);
 $village = $summaryStmt->fetch();
 
 if (!$village) {
-    echo '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ไม่พบหมู่บ้าน: ' . htmlspecialchars($ban_e) . '</div>';
+    echo '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ไม่พบหมู่บ้าน: ' . htmlspecialchars($name) . '</div>';
     return;
 }
 
@@ -38,39 +38,39 @@ $offset = ($page_num - 1) * $perPage;
 $plotsStmt = $db->prepare("SELECT lp.*, v.prefix, v.first_name, v.last_name, v.id_card_number
     FROM land_plots lp
     JOIN villagers v ON lp.villager_id = v.villager_id
-    WHERE lp.ban_e = :ban_e
+    WHERE lp.par_ban = :name
     ORDER BY lp.plot_code
     LIMIT $perPage OFFSET $offset");
-$plotsStmt->execute(['ban_e' => $ban_e]);
+$plotsStmt->execute(['name' => $name]);
 $plots = $plotsStmt->fetchAll();
 $totalPages = max(1, ceil($village['total_plots'] / $perPage));
 
 // สถิติ: แยกตามประเภทที่ดิน
-$byLandUse = $db->prepare("SELECT land_use_type, COUNT(*) as cnt FROM land_plots WHERE ban_e = :ban_e GROUP BY land_use_type ORDER BY cnt DESC");
-$byLandUse->execute(['ban_e' => $ban_e]);
+$byLandUse = $db->prepare("SELECT land_use_type, COUNT(*) as cnt FROM land_plots WHERE par_ban = :name GROUP BY land_use_type ORDER BY cnt DESC");
+$byLandUse->execute(['name' => $name]);
 $landUseData = $byLandUse->fetchAll();
 
 // สถิติ: แยกตามสถานะ
-$byStatus = $db->prepare("SELECT status, COUNT(*) as cnt FROM land_plots WHERE ban_e = :ban_e GROUP BY status ORDER BY cnt DESC");
-$byStatus->execute(['ban_e' => $ban_e]);
+$byStatus = $db->prepare("SELECT status, COUNT(*) as cnt FROM land_plots WHERE par_ban = :name GROUP BY status ORDER BY cnt DESC");
+$byStatus->execute(['name' => $name]);
 $statusData = $byStatus->fetchAll();
 
 // ข้อมูลแปลงสำหรับแผนที่ (ที่มีพิกัด)
 $mapStmt = $db->prepare("SELECT plot_id, plot_code, latitude, longitude, polygon_coords, status, area_rai, area_ngan
-    FROM land_plots WHERE ban_e = :ban_e AND latitude IS NOT NULL AND longitude IS NOT NULL");
-$mapStmt->execute(['ban_e' => $ban_e]);
+    FROM land_plots WHERE par_ban = :name AND latitude IS NOT NULL AND longitude IS NOT NULL");
+$mapStmt->execute(['name' => $name]);
 $mapPlots = $mapStmt->fetchAll();
 
 $v = $village;
 $pct = $v['total_plots'] > 0 ? round($v['surveyed_count'] / $v['total_plots'] * 100) : 0;
 
-// สีของหมู่บ้าน
+// สีของหมู่บ้าน (ใช้รหัสหมู่บ้าน ban_e ในการเลือกสี)
 $villageColors = [
     'BKR' => '#059669', 'PDS' => '#2563eb', 'TSL' => '#7c3aed', 'CSD' => '#dc2626',
     'TKT' => '#ea580c', 'TKY' => '#0891b2', 'BPT' => '#16a34a', 'BMT' => '#9333ea',
     'BPM' => '#0284c7', 'BKK' => '#b45309', 'POK' => '#be185d', 'BTS' => '#4f46e5',
 ];
-$themeColor = $villageColors[$ban_e] ?? '#059669';
+$themeColor = $villageColors[$v['ban_e'] ?? ''] ?? '#059669';
 ?>
 
 <!-- Back + Title -->
@@ -85,7 +85,7 @@ $themeColor = $villageColors[$ban_e] ?? '#059669';
             <div>
                 <h2 style="font-size:24px; margin-bottom:4px;">🏘️ บ้าน<?= htmlspecialchars($v['par_ban']) ?></h2>
                 <p style="opacity:0.9;">
-                    รหัส <strong><?= htmlspecialchars($ban_e) ?></strong> ·
+                    รหัส <strong><?= htmlspecialchars($v['ban_e'] ?? '-') ?></strong> ·
                     ม.<?= htmlspecialchars($v['par_moo']) ?>
                     ต.<?= htmlspecialchars($v['par_tam']) ?>
                     อ.<?= htmlspecialchars($v['par_amp']) ?>
@@ -224,7 +224,7 @@ $themeColor = $villageColors[$ban_e] ?? '#059669';
             <div class="card-footer">
                 <div class="pagination">
                     <?php if ($page_num > 1): ?>
-                        <a href="index.php?page=villages&action=view&ban_e=<?= urlencode($ban_e) ?>&p=<?= $page_num - 1 ?>">
+                        <a href="index.php?page=villages&action=view&name=<?= urlencode($name) ?>&p=<?= $page_num - 1 ?>">
                             <i class="bi bi-chevron-left"></i>
                         </a>
                     <?php endif; ?>
@@ -232,11 +232,11 @@ $themeColor = $villageColors[$ban_e] ?? '#059669';
                         <?php if ($pg == $page_num): ?>
                             <span class="active"><?= $pg ?></span>
                         <?php else: ?>
-                            <a href="index.php?page=villages&action=view&ban_e=<?= urlencode($ban_e) ?>&p=<?= $pg ?>"><?= $pg ?></a>
+                            <a href="index.php?page=villages&action=view&name=<?= urlencode($name) ?>&p=<?= $pg ?>"><?= $pg ?></a>
                         <?php endif; ?>
                     <?php endfor; ?>
                     <?php if ($page_num < $totalPages): ?>
-                        <a href="index.php?page=villages&action=view&ban_e=<?= urlencode($ban_e) ?>&p=<?= $page_num + 1 ?>">
+                        <a href="index.php?page=villages&action=view&name=<?= urlencode($name) ?>&p=<?= $page_num + 1 ?>">
                             <i class="bi bi-chevron-right"></i>
                         </a>
                     <?php endif; ?>

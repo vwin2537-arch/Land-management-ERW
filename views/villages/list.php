@@ -93,7 +93,7 @@ $villageColors = [
         $issuesPct = $v['total_plots'] > 0 ? round($v['issues_count'] / $v['total_plots'] * 100) : 0;
     ?>
         <div class="card" style="overflow:hidden; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;"
-            onclick="location.href='index.php?page=villages&action=view&ban_e=<?= urlencode($code) ?>'"
+            onclick="location.href='index.php?page=villages&action=view&name=<?= urlencode($v['par_ban']) ?>'"
             onmouseenter="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.12)';"
             onmouseleave="this.style.transform=''; this.style.boxShadow='';">
 
