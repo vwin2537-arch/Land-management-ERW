@@ -1,0 +1,10 @@
+.git
+.env
+.env.example
+*.md
+.gemini/
+.agent/
+.claude/
+brain/
+tools/
+sql/schema.sql
