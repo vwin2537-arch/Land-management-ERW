@@ -4,6 +4,7 @@
  */
 
 $db = getDB();
+require_once __DIR__ . '/../../models/Villager.php';
 $search = trim($_GET['search'] ?? '');
 $page_num = max(1, (int) ($_GET['p'] ?? 1));
 $offset = ($page_num - 1) * ITEMS_PER_PAGE;
