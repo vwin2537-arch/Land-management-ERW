@@ -5,6 +5,39 @@
  */
 
 /**
+ * Load .env file if exists (for local development)
+ */
+function load_env_file() {
+    $envFile = __DIR__ . '/../.env';
+    if (!file_exists($envFile)) return;
+
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || $line[0] === '#') continue;
+        if (strpos($line, '=') === false) continue;
+
+        list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        // Remove surrounding quotes
+        if ((str_starts_with($value, '"') && str_ends_with($value, '"')) ||
+            (str_starts_with($value, "'") && str_ends_with($value, "'"))) {
+            $value = substr($value, 1, -1);
+        }
+
+        if (!getenv($key)) {
+            putenv("$key=$value");
+        }
+        if (!isset($_ENV[$key])) {
+            $_ENV[$key] = $value;
+        }
+    }
+}
+
+load_env_file();
+
+/**
  * Get environment variable from multiple sources
  */
 function get_config($key, $default = null) {
@@ -14,7 +47,6 @@ function get_config($key, $default = null) {
     return $default;
 }
 
-// 1. ลองดึงจาก MYSQL_URL (Railway)
 // 1. ลองดึงจาก MYSQL_URL (Railway)
 $mysql_url = get_config('MYSQL_URL') ?: get_config('MYSQLDATABASE_URL');
 $p = $mysql_url ? parse_url($mysql_url) : null;

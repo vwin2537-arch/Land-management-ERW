@@ -1,0 +1,12 @@
+.git
+.gitignore
+.env
+.env.example
+debug_env.php
+*.md
+.gemini/
+.agent/
+brain/
+sql/schema.sql
+sql/full_backup_railway.sql
+tools/
