@@ -5,7 +5,7 @@
  */
 
 // ใช้ค่าจาก Environment Variables (ถ้ามี) สำหรับ Cloud Deployment
-define('DB_HOST',    getenv('DB_HOST')     ?: 'localhost');
+define('DB_HOST',    getenv('DB_HOST')     ?: '127.0.0.1');
 define('DB_NAME',    getenv('DB_NAME')     ?: 'land_management');
 define('DB_USER',    getenv('DB_USER')     ?: 'root');
 define('DB_PASS',    getenv('DB_PASS')     !== false ? getenv('DB_PASS') : '');
