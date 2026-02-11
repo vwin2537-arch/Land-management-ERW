@@ -1190,4 +1190,32 @@ input[type="file"].form-control {
     .villager-detail-grid {
         grid-template-columns: 1fr;
     }
+
+    /* Search & Mobile Form Wrapping */
+    .wrap-mobile {
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+    }
+
+    .wrap-mobile>* {
+        flex: 1 1 auto;
+    }
+
+    .wrap-mobile .search-bar {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        max-width: none !important;
+    }
+
+    .wrap-mobile .form-control,
+    .wrap-mobile .btn {
+        flex: 1 1 calc(50% - 10px);
+        min-width: 120px;
+    }
+
+    .search-bar input {
+        font-size: 16px !important;
+        /* Improves mobile typing experience and prevents auto-zoom on iOS */
+        padding: 12px 14px 12px 42px !important;
+    }
 }

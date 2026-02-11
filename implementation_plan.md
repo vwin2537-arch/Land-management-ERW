@@ -615,10 +615,13 @@ PHP_SQL/
 - [x] Dashboard: Stat Cards + Charts
 - [x] Activity logging ในทุก controller
 
-### Phase 6: Polish & Deploy 🚀 — รอเริ่ม
-- [ ] Responsive สำหรับ Tablet (ใช้ในสนาม)
+### Phase 6: Polish & Deploy 🚀 — กำลังดำเนินการ
+- [x] Deploy ขึ้น Server (Railway) ✅
+- [/] Responsive สำหรับ Mobile/Tablet (ใช้ในสนาม)
+    - [ ] แก้ไข UI ช่องค้นหาในหน้าทะเบียนราษฎร (Villager List) สำหรับมือถือ
+    - [ ] เพิ่ม class `.wrap-mobile` ใน `style.css`
+    - [ ] ปรับความสูงและขนาดฟอนต์ของ Input บนมือถือให้พิมพ์ง่ายขึ้น
 - [ ] ทดสอบครบวงจร
-- [ ] Deploy ขึ้น Server
 
 ---
 
