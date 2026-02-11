@@ -8,5 +8,5 @@ debug_env.php
 .agent/
 brain/
 sql/schema.sql
-sql/full_backup_railway.sql
+sql/schema_railway.sql
 tools/
