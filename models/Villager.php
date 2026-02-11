@@ -25,8 +25,8 @@ class Villager
         // Determine sort order
         $orderBy = match ($sortBy) {
             'name_asc' => 'v.first_name ASC, v.last_name ASC',
-            'plots_desc' => 'plot_count DESC',
-            'area_desc' => 'total_area_rai DESC',
+            'plots_desc' => '(SELECT COUNT(*) FROM land_plots lp WHERE lp.villager_id = v.villager_id) DESC',
+            'area_desc' => '(SELECT COALESCE(SUM(area_rai + area_ngan/4 + area_sqwa/400), 0) FROM land_plots lp WHERE lp.villager_id = v.villager_id) DESC',
             default => 'v.created_at DESC'
         };
 
