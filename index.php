@@ -184,7 +184,7 @@ if (isset($_SESSION['user_id'])) {
             include VIEW_PATH . 'map/index.php';
             break;
         case 'villages':
-            if ($action === 'view' && isset($_GET['ban_e'])) {
+            if ($action === 'view' && (isset($_GET['name']) || isset($_GET['ban_e']))) {
                 include VIEW_PATH . 'villages/detail.php';
             } else {
                 include VIEW_PATH . 'villages/list.php';
