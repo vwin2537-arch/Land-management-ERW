@@ -26,6 +26,9 @@ try {
     $sql = str_replace("\r\n", "\n", $sql);
     $sql = str_replace("\r", "\n", $sql);
     
+    // Replace problematic collation with standard one
+    $sql = str_replace("utf8mb4_thai_520_w2", "utf8mb4_unicode_ci", $sql);
+    
     // Remove only plain comments (lines starting with --)
     $sql = preg_replace('/^--.*$/m', '', $sql);
     
