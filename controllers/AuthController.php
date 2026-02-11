@@ -51,7 +51,7 @@ class AuthController
                 exit;
             }
         } catch (PDOException $e) {
-            $_SESSION['login_error'] = 'เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล';
+            $_SESSION['login_error'] = 'เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล: ' . $e->getMessage();
             header('Location: index.php?page=login');
             exit;
         }
