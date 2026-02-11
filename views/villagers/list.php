@@ -50,10 +50,10 @@ $villagers = Villager::getAll($search, $sortBy, ITEMS_PER_PAGE, $offset);
     <div class="card-body" style="padding: 16px 20px;">
         <form method="GET" class="d-flex gap-1 align-center wrap-mobile">
             <input type="hidden" name="page" value="villagers">
-            <div class="search-bar" style="flex:1;">
+            <div class="search-bar">
                 <i class="bi bi-search"></i>
                 <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" 
-                    placeholder="ค้นหาด้วย เลขบัตร ปชช. / ชื่อ / นามสกุล / หมู่บ้าน...">
+                    placeholder="ค้นหา เลขบัตร ปชช. / ชื่อ / หมู่บ้าน...">
             </div>
             
             <select name="sort" class="form-control" style="width:auto; min-width:150px;" onchange="this.form.submit()">

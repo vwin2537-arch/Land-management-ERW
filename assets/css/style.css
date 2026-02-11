@@ -1194,7 +1194,7 @@ input[type="file"].form-control {
     /* Search & Mobile Form Wrapping */
     .wrap-mobile {
         flex-wrap: wrap !important;
-        gap: 10px !important;
+        gap: 12px !important;
     }
 
     .wrap-mobile>* {
@@ -1205,17 +1205,31 @@ input[type="file"].form-control {
         width: 100% !important;
         flex: 1 1 100% !important;
         max-width: none !important;
+        margin-bottom: 4px;
     }
 
-    .wrap-mobile .form-control,
+    .wrap-mobile .search-bar input {
+        width: 100% !important;
+        display: block !important;
+    }
+
+    .wrap-mobile select.form-control {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: 1 1 100% !important;
+    }
+
     .wrap-mobile .btn {
-        flex: 1 1 calc(50% - 10px);
-        min-width: 120px;
+        flex: 1 1 45% !important;
+        justify-content: center;
+        padding: 12px !important;
     }
 
     .search-bar input {
         font-size: 16px !important;
-        /* Improves mobile typing experience and prevents auto-zoom on iOS */
+        /* Prevent iOS zoom */
         padding: 12px 14px 12px 42px !important;
+        min-height: 48px;
+        /* Larger tap target */
     }
 }

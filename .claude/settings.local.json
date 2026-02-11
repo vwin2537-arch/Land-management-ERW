@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd Railway deployment setup: Dockerfile, schema, and .env loader\n\n- Add Dockerfile \\(PHP 8.2 + Apache\\) for Railway deployment\n- Add setup.php for one-click database schema import\n- Add schema_railway.sql compatible with Railway''s ''railway'' database\n- Add .env file loader in database.php for local development\n- Add .dockerignore to optimize Docker builds\n- Add .env to .gitignore to protect credentials\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  }
+}
