@@ -48,7 +48,7 @@ $villageColors = [
 ?>
 
 <!-- Summary Stats -->
-<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:24px;">
+<div class="village-stats-grid">
     <div class="card" style="border-left:4px solid var(--primary-600);">
         <div class="card-body" style="padding:20px; display:flex; align-items:center; gap:16px;">
             <div style="width:48px; height:48px; border-radius:12px; background:var(--primary-50); display:flex; align-items:center; justify-content:center;">

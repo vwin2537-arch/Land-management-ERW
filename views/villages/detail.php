@@ -124,7 +124,7 @@ $themeColor = $villageColors[$v['ban_e'] ?? ''] ?? '#059669';
 </div>
 
 <!-- Grid: Map + Charts -->
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+<div class="map-chart-grid">
     <!-- Map -->
     <div class="card">
         <div class="card-header">

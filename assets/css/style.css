@@ -1060,6 +1060,7 @@ input[type="file"].form-control {
 
 /* ===== Responsive Design (Mobile) ===== */
 @media (max-width: 768px) {
+
     /* Layout */
     .sidebar {
         transform: translateX(-100%);
@@ -1089,7 +1090,7 @@ input[type="file"].form-control {
         text-overflow: ellipsis;
         max-width: 180px;
     }
-    
+
     .topbar-right .search-bar {
         display: none;
     }
@@ -1098,7 +1099,7 @@ input[type="file"].form-control {
     .page-content {
         padding: 16px;
     }
-    
+
     .stat-grid {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -1114,24 +1115,59 @@ input[type="file"].form-control {
         background: rgba(0, 0, 0, 0.5);
         z-index: 900;
         opacity: 0;
-        visibility: hidden; /* Use visibility for better performance than display:none */
+        visibility: hidden;
+        /* Use visibility for better performance than display:none */
         transition: opacity 0.3s;
     }
-    
+
     .sidebar-overlay.show {
         visibility: visible;
         opacity: 1;
     }
-    
+
     /* Table Responsive */
     .table-container {
         margin: 0 -16px;
         border-radius: 0;
-        padding: 0 16px; 
+        padding: 0 16px;
     }
 }
 
-/* PWA Install Button (Hidden by default) */
 #pwa-install-btn {
     display: none;
+}
+
+/* ===== Village Detail Responsive Grids ===== */
+.village-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.map-chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .village-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .map-chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Adjust map height on mobile */
+    #villageMap {
+        height: 300px !important;
+    }
+
+    /* Ensure charts don't get squashed */
+    .chart-container {
+        min-height: 200px;
+    }
 }
