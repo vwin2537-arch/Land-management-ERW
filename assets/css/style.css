@@ -1057,3 +1057,81 @@ input[type="file"].form-control {
         border: 1px solid #ddd !important;
     }
 }
+
+/* ===== Responsive Design (Mobile) ===== */
+@media (max-width: 768px) {
+    /* Layout */
+    .sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-width);
+        z-index: 1000;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* Topbar */
+    .topbar {
+        padding: 0 16px;
+    }
+
+    .topbar-left .page-title {
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+    }
+    
+    .topbar-right .search-bar {
+        display: none;
+    }
+
+    /* Cards & Stats */
+    .page-content {
+        padding: 16px;
+    }
+    
+    .stat-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    /* Overlay for sidebar */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 900;
+        opacity: 0;
+        visibility: hidden; /* Use visibility for better performance than display:none */
+        transition: opacity 0.3s;
+    }
+    
+    .sidebar-overlay.show {
+        visibility: visible;
+        opacity: 1;
+    }
+    
+    /* Table Responsive */
+    .table-container {
+        margin: 0 -16px;
+        border-radius: 0;
+        padding: 0 16px; 
+    }
+}
+
+/* PWA Install Button (Hidden by default) */
+#pwa-install-btn {
+    display: none;
+}

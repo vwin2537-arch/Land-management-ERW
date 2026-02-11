@@ -45,6 +45,20 @@ $initials = mb_substr($_SESSION['full_name'] ?? 'U', 0, 1, 'UTF-8');
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <?php endif; ?>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#166534">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('SW registered'))
+            .catch(err => console.log('SW registration failed: ', err));
+        });
+      }
+    </script>
 </head>
 
 <body>
@@ -119,6 +133,11 @@ $initials = mb_substr($_SESSION['full_name'] ?? 'U', 0, 1, 'UTF-8');
             </nav>
 
             <div class="sidebar-footer">
+                <div id="pwa-install-btn" class="nav-item" style="background:rgba(255,255,255,0.15); margin-bottom:12px; justify-content:center; color:white; font-weight:600;">
+                    <i class="bi bi-download"></i>
+                    <span>ติดตั้งแอป</span>
+                </div>
+
                 <div class="sidebar-user">
                     <div class="avatar">
                         <?= $initials ?>
@@ -138,6 +157,29 @@ $initials = mb_substr($_SESSION['full_name'] ?? 'U', 0, 1, 'UTF-8');
                 </div>
             </div>
         </aside>
+
+        <script>
+        // PWA Install Logic
+        let deferredPrompt;
+        const installBtn = document.getElementById('pwa-install-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'flex';
+        });
+
+        installBtn.addEventListener('click', () => {
+            installBtn.style.display = 'none';
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the A2HS prompt');
+                }
+                deferredPrompt = null;
+            });
+        });
+        </script>
 
         <!-- ===== Main Content ===== -->
         <div class="main-content">

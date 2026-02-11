@@ -22,8 +22,8 @@ $sql = "SELECT
     AVG(latitude) as center_lat,
     AVG(longitude) as center_lng
 FROM land_plots
-WHERE ban_e IS NOT NULL AND ban_e != ''
-GROUP BY ban_e
+WHERE par_ban IS NOT NULL AND par_ban != ''
+GROUP BY par_ban
 ORDER BY total_plots DESC";
 
 $villages = $db->query($sql)->fetchAll();
