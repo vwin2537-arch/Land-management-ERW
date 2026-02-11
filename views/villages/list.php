@@ -7,12 +7,12 @@ $db = getDB();
 
 // ดึงข้อมูลสรุปรายหมู่บ้าน
 $sql = "SELECT 
-    ban_e,
+    MAX(ban_e) as ban_e,
     par_ban,
-    par_moo,
-    par_tam,
-    par_amp,
-    par_prov,
+    MAX(par_moo) as par_moo,
+    MAX(par_tam) as par_tam,
+    MAX(par_amp) as par_amp,
+    MAX(par_prov) as par_prov,
     COUNT(*) as total_plots,
     COUNT(DISTINCT villager_id) as total_villagers,
     ROUND(SUM(area_rai + area_ngan/4 + area_sqwa/400), 2) as total_area_rai,
