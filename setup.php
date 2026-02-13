@@ -44,6 +44,9 @@ try {
 
     $sql = file_get_contents($file);
 
+    // Normalize line endings (Windows CRLF -> LF)
+    $sql = str_replace("\r\n", "\n", $sql);
+
     // Fix MariaDB -> MySQL 9.x compatibility
     $sql = str_replace('utf8mb4_thai_520_w2', 'utf8mb4_unicode_ci', $sql);
     $sql = preg_replace('/\s+CHECK\s*\(json_valid\(`[^`]+`\)\)/', '', $sql);
