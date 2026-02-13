@@ -1,7 +1,7 @@
 # SETUP GUIDE — ระบบจัดการที่ดินทำกิน (LandMS)
 
 > **ไฟล์นี้สำหรับ AI หรือ Developer อ่านไฟล์เดียวแล้วเซ็ตอัพโปรเจคได้ทันที**
-> อัพเดทล่าสุด: 2026-02-14 (v3 — เพิ่ม SHP QA Audit Workflow)
+> อัพเดทล่าสุด: 2026-02-14 (v4 — เพิ่ม Railway Deploy Guide + Troubleshooting)
 
 ---
 
@@ -530,7 +530,166 @@ python tools/audit_report.py    # → tools/audit_hardpaper.txt
 
 ---
 
-## 9. คำสั่งที่ใช้บ่อย
+## 9. Deploy บน Railway (Production)
+
+> **อัพเดทล่าสุด**: 2026-02-14 — deploy สำเร็จ + แก้ปัญหา encoding ภาษาไทย
+
+### 9.1 สถาปัตยกรรม
+
+```
+GitHub (main branch)
+    │
+    ▼  auto-deploy on push
+┌─────────────────────────────────────────────┐
+│  Railway Project: upbeat-fascination        │
+│                                             │
+│  ┌─────────────────┐  ┌──────────────────┐  │
+│  │ Land-management │  │     MySQL        │  │
+│  │ -ERW (PHP app)  │──│  (DB: railway)   │  │
+│  │ Dockerfile      │  │  mysql.railway   │  │
+│  │ php:8.2-cli     │  │  .internal:3306  │  │
+│  └─────────────────┘  └──────────────────┘  │
+│                                             │
+│  Environment Variables:                     │
+│  - MYSQL_URL (auto-injected)                │
+│  - PORT (auto-injected)                     │
+└─────────────────────────────────────────────┘
+```
+
+### 9.2 ไฟล์ที่เกี่ยวข้อง
+
+| ไฟล์ | หน้าที่ |
+|------|---------|
+| `Dockerfile` | Build image: `php:8.2-cli` + `pdo_mysql` + built-in server บน `$PORT` |
+| `config/database.php` | Parse `MYSQL_URL` อัตโนมัติ (Railway inject ให้) |
+| `setup.php` | Web-based DB import — เปิดครั้งเดียวหลัง deploy |
+| `sql/full_backup_railway.sql` | Backup ข้อมูลจริงทั้งหมด (export จาก local) |
+| `.dockerignore` | ไม่ copy `.env`, `.git`, `tools/`, `sql/schema.sql` เข้า container |
+| `.gitignore` | ไม่ push `.env`, uploads, shapefile data |
+
+### 9.3 ขั้นตอน Deploy (ครั้งแรก)
+
+```
+1. สร้าง Railway Project → New Project
+2. เพิ่ม MySQL service → New Service → MySQL
+3. เพิ่ม PHP app → Deploy from GitHub repo (vwin2537-arch/Land-management-ERW)
+4. Railway จะ inject MYSQL_URL ให้ app อัตโนมัติ (ถ้าอยู่ project เดียวกัน)
+5. รอ build จาก Dockerfile (~1-2 นาที)
+6. เปิด https://your-app.railway.app/setup.php → import DB
+7. Login: admin / admin123
+```
+
+### 9.4 ขั้นตอน Re-deploy (อัพเดทข้อมูล)
+
+```powershell
+# 1. Export DB backup ใหม่จาก local (ใช้ --result-file เท่านั้น!)
+C:\xampp\mysql\bin\mysqldump.exe -u root --default-character-set=utf8mb4 --routines --triggers --result-file=sql\full_backup_railway.sql land_management
+
+# 2. Commit + Push
+git add -A
+git commit -m "update backup"
+git push origin main
+
+# 3. รอ Railway auto-deploy (~1-2 นาที)
+
+# 4. เปิด setup.php?reset=1 เพื่อ drop + re-import
+# https://your-app.railway.app/setup.php?reset=1
+```
+
+### 9.5 ปัญหาที่เจอ + วิธีแก้ (Troubleshooting)
+
+#### ❌ ปัญหา 1: `0 statements executed` — SQL split ไม่ทำงาน
+
+**อาการ**: setup.php แสดง "OK: 0 statements executed" + "Syntax error near ''"
+**สาเหตุ**: Backup file มี CRLF line ending (`\r\n`) แต่ PHP `explode(";\n")` ตัดไม่ถูก
+**สาเหตุรอง**: UTF-8 BOM (3 bytes `EF BB BF`) ติดหน้า SQL ทำให้ statement แรกพัง
+
+**วิธีแก้ (ใน setup.php)**:
+```php
+// Strip UTF-8 BOM
+if (substr($sql, 0, 3) === "\xEF\xBB\xBF") {
+    $sql = substr($sql, 3);
+}
+// Normalize CRLF → LF
+$sql = str_replace("\r\n", "\n", $sql);
+$sql = str_replace("\r", "\n", $sql);
+// ใช้ preg_split แทน explode
+$statements = preg_split('/;\s*\n/', $sql);
+```
+
+**วิธีป้องกัน**: Export ด้วย `--result-file` (binary write) ไม่ใช่ pipe ผ่าน PowerShell
+```powershell
+# ✅ ถูก — ใช้ --result-file (ไม่ผ่าน pipe)
+mysqldump --result-file=sql\full_backup_railway.sql land_management
+
+# ❌ ผิด — pipe ผ่าน PowerShell จะเพิ่ม BOM + เปลี่ยน encoding
+mysqldump land_management | Out-File sql\full_backup_railway.sql
+
+# ❌ ผิด — redirect > ใน PowerShell ก็เปลี่ยน encoding
+mysqldump land_management > sql\full_backup_railway.sql
+```
+
+#### ❌ ปัญหา 2: ภาษาไทยเพี้ยน (mojibake) — `เปิเรดนเปิเรชเรดเปิ`
+
+**อาการ**: ข้อมูลภาษาไทยแสดงเป็นอักขระเพี้ยน ทั้ง dashboard และทะเบียนราษฎร
+**สาเหตุ**: Backup file ถูก export ผ่าน PowerShell pipe ซึ่งเปลี่ยน encoding จาก UTF-8 เป็น UTF-16 หรือ Windows-1252
+
+**วิธีแก้**:
+1. Re-export ด้วย `--result-file` + `--default-character-set=utf8mb4`:
+```powershell
+C:\xampp\mysql\bin\mysqldump.exe -u root --default-character-set=utf8mb4 --routines --triggers --result-file=sql\full_backup_railway.sql land_management
+```
+2. เพิ่ม `SET NAMES utf8mb4` ใน setup.php ก่อน import:
+```php
+$db->exec("SET NAMES utf8mb4");
+$db->exec("SET CHARACTER SET utf8mb4");
+```
+3. Reset DB บน Railway: เปิด `setup.php?reset=1`
+
+#### ❌ ปัญหา 3: `Table 'railway.users' doesn't exist`
+
+**อาการ**: เปิดหน้า app แล้ว error ว่าไม่มี table
+**สาเหตุ**: Railway MySQL ใช้ DB ชื่อ `railway` (ไม่ใช่ `land_management`) — ต้องรัน setup.php ก่อน
+**วิธีแก้**: เปิด `/setup.php` เพื่อ import tables เข้า DB `railway`
+
+#### ❌ ปัญหา 4: MariaDB → MySQL 9.x compatibility
+
+**อาการ**: SQL error เรื่อง collation หรือ CHECK constraint
+**สาเหตุ**: XAMPP ใช้ MariaDB แต่ Railway ใช้ MySQL 9.x ซึ่งไม่รองรับบาง syntax
+
+**วิธีแก้ (setup.php ทำอัตโนมัติ)**:
+```php
+// แก้ collation ที่ MySQL 9.x ไม่รู้จัก
+$sql = str_replace('utf8mb4_thai_520_w2', 'utf8mb4_unicode_ci', $sql);
+// ลบ CHECK constraint ที่ MariaDB สร้าง
+$sql = preg_replace('/\s+CHECK\s*\(json_valid\(`[^`]+`\)\)/', '', $sql);
+// ลบ USE database (Railway ใช้ชื่อ DB ต่างกัน)
+$sql = preg_replace('/^USE\s+`?land_management`?\s*;?\s*$/m', '', $sql);
+```
+
+### 9.6 ข้อจำกัดของ Railway
+
+| ข้อจำกัด | รายละเอียด |
+|----------|-----------|
+| **Ephemeral storage** | ไฟล์ที่ upload (photos, documents) จะหายเมื่อ redeploy — ต้องใช้ S3/R2 ถ้าต้องการเก็บถาวร |
+| **DB ชื่อ `railway`** | Railway MySQL ใช้ DB ชื่อ `railway` ไม่ใช่ `land_management` — `database.php` parse จาก `MYSQL_URL` อัตโนมัติ |
+| **Credit limit** | Free tier มี $5/เดือน — ดู usage ที่ Railway dashboard |
+| **Build time** | Auto-deploy ทุกครั้งที่ push — build ใช้เวลา ~1-2 นาที |
+| **setup.php ต้อง protect** | หลัง import เสร็จ ควรลบ setup.php หรือเพิ่ม auth check ป้องกันคนอื่นเข้าถึง |
+
+### 9.7 Checklist ก่อน Push ขึ้น Production
+
+- [ ] Export backup ใหม่ด้วย `--result-file` (ไม่ใช่ pipe)
+- [ ] ตรวจว่า `sql/full_backup_railway.sql` ไม่ถูก gitignore
+- [ ] ตรวจว่า `.env` ถูก gitignore (ห้าม push credentials)
+- [ ] ตรวจว่า `uploads/` ถูก gitignore (ไม่ push ไฟล์ upload)
+- [ ] Commit + Push + รอ build เสร็จ
+- [ ] เปิด `/setup.php` (ครั้งแรก) หรือ `/setup.php?reset=1` (re-import)
+- [ ] ทดสอบ login + ตรวจภาษาไทย
+
+---
+
+## 10. คำสั่งที่ใช้บ่อย
 
 ```powershell
 # รัน migration
@@ -553,7 +712,7 @@ python tools/audit_report.py      # สร้างรายงานตรว�
 
 ---
 
-## 10. ข้อควรระวัง
+## 11. ข้อควรระวัง
 
 - **PHP ไม่อยู่ใน PATH** — ต้องใช้ `C:\xampp\php\php.exe` (full path) ใน PowerShell
 - **PowerShell escaping** — ใช้ `& "path"` สำหรับ path ที่มี space / ใช้ไฟล์ .php แทน inline `-r`
