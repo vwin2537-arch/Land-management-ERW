@@ -44,31 +44,44 @@ try {
 
     $sql = file_get_contents($file);
 
+    // Strip UTF-8 BOM if present
+    if (substr($sql, 0, 3) === "\xEF\xBB\xBF") {
+        $sql = substr($sql, 3);
+    }
+
     // Normalize line endings (Windows CRLF -> LF)
     $sql = str_replace("\r\n", "\n", $sql);
+    $sql = str_replace("\r", "\n", $sql);
 
     // Fix MariaDB -> MySQL 9.x compatibility
     $sql = str_replace('utf8mb4_thai_520_w2', 'utf8mb4_unicode_ci', $sql);
     $sql = preg_replace('/\s+CHECK\s*\(json_valid\(`[^`]+`\)\)/', '', $sql);
     $sql = preg_replace('/^CREATE DATABASE.*$/m', '', $sql);
-    $sql = preg_replace('/^USE\s+`?land_management`?\s*;/m', '', $sql);
+    $sql = preg_replace('/^USE\s+`?land_management`?\s*;?\s*$/m', '', $sql);
+    $sql = preg_replace('/^USE\s+`?railway`?\s*;?\s*$/m', '', $sql);
+
+    echo "<p>SQL size: " . strlen($sql) . " bytes</p>";
 
     // Execute
     $db->exec("SET FOREIGN_KEY_CHECKS=0");
     $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 
-    $statements = array_filter(array_map('trim', explode(";\n", $sql)));
+    // Split on semicolon followed by newline (handles multi-line statements)
+    $statements = preg_split('/;\s*\n/', $sql);
+    $statements = array_filter(array_map('trim', $statements));
+
     $success = 0;
     $errors = [];
 
     foreach ($statements as $s) {
-        $s = trim($s);
-        if (empty($s) || (strpos($s, '--') === 0 && strpos($s, "\n") === false)) continue;
+        if (empty($s) || $s === ';') continue;
+        // Skip pure comment lines
+        if (preg_match('/^--/', $s) && strpos($s, "\n") === false) continue;
         try {
             $db->exec($s);
             $success++;
         } catch (PDOException $e) {
-            $errors[] = $e->getMessage();
+            $errors[] = substr($s, 0, 80) . '... → ' . $e->getMessage();
         }
     }
 
