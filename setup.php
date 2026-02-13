@@ -63,6 +63,8 @@ try {
     echo "<p>SQL size: " . strlen($sql) . " bytes</p>";
 
     // Execute
+    $db->exec("SET NAMES utf8mb4");
+    $db->exec("SET CHARACTER SET utf8mb4");
     $db->exec("SET FOREIGN_KEY_CHECKS=0");
     $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 
