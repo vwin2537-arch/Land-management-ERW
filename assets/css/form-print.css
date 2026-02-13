@@ -10,23 +10,25 @@
 * { box-sizing: border-box; }
 
 body.form-print {
-    font-family: 'TH Sarabun New', 'Sarabun', 'Tahoma', sans-serif;
+    font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
     font-size: 14pt;
     line-height: 1.4;
     color: #000;
     background: #fff;
     margin: 0;
     padding: 0;
+    -webkit-text-size-adjust: 100%;
 }
 
 body.form-print-portrait {
-    font-family: 'TH Sarabun New', 'Sarabun', 'Tahoma', sans-serif;
+    font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
     font-size: 14pt;
     line-height: 1.4;
     color: #000;
     background: #fff;
     margin: 0;
     padding: 0;
+    -webkit-text-size-adjust: 100%;
 }
 
 @page portrait { size: A4 portrait; margin: 15mm; }
@@ -284,4 +286,65 @@ body.form-print-portrait { page: portrait; }
         border: 1px solid #e0e0e0;
         border-radius: 4px;
     }
+}
+
+/* ---- Mobile responsive (มือถือ) ---- */
+@media screen and (max-width: 768px) {
+    .form-toolbar {
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .form-toolbar h2 {
+        font-size: 11pt;
+        width: 100%;
+    }
+    .form-toolbar .btn {
+        font-size: 10pt;
+        padding: 5px 10px;
+    }
+
+    .form-page {
+        max-width: 100%;
+        margin: 52px 0 16px;
+        padding: 8px;
+        border: none;
+        box-shadow: none;
+        overflow-x: auto;
+    }
+
+    .form-header h1 { font-size: 13pt; }
+    .form-header .form-subtitle,
+    .form-header .form-meta,
+    .form-header .form-code { font-size: 10pt; }
+
+    .form-table {
+        font-size: 9pt;
+        table-layout: auto;
+        min-width: 700px;
+    }
+    .form-table th,
+    .form-table td {
+        padding: 2px 3px;
+        font-size: 9pt;
+    }
+    .form-table thead th {
+        font-size: 8pt;
+    }
+    .form-table tfoot td {
+        font-size: 9pt;
+    }
+
+    .form-signatures {
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .form-footer { font-size: 10pt; }
+    .form-notes { font-size: 8pt; }
+    .form-notes h4 { font-size: 9pt; }
+
+    .cert-body { font-size: 12pt; line-height: 1.6; text-indent: 20px; }
+    .cert-checklist { font-size: 11pt; margin-left: 20px; }
 }
