@@ -17,10 +17,23 @@ try {
     // Check if already set up
     $stmt = $db->query("SHOW TABLES");
     $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    if (in_array('users', $tables)) {
+    if (in_array('users', $tables) && !isset($_GET['reset'])) {
         echo "<p style='color:green;'>Tables already exist (" . count($tables) . " tables).</p>";
         echo "<p><a href='index.php'>Go to app</a></p>";
+        echo "<hr><p style='color:#666;'>ถ้าต้องการ import ข้อมูลใหม่ทั้งหมด (drop แล้ว re-import):</p>";
+        echo "<p><a href='setup.php?reset=1' style='color:red;' onclick=\"return confirm('จะลบข้อมูลเก่าทั้งหมดแล้ว import ใหม่ แน่ใจหรือไม่?');\">⚠️ Reset & Re-import</a></p>";
         exit;
+    }
+
+    // Drop all existing tables if reset requested
+    if (isset($_GET['reset']) && !empty($tables)) {
+        echo "<p style='color:orange;'>Dropping " . count($tables) . " tables...</p>";
+        $db->exec("SET FOREIGN_KEY_CHECKS=0");
+        foreach ($tables as $t) {
+            $db->exec("DROP TABLE IF EXISTS `$t`");
+        }
+        $db->exec("SET FOREIGN_KEY_CHECKS=1");
+        echo "<p>Done. Re-importing...</p>";
     }
 
     // Read backup file
