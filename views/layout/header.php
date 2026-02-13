@@ -10,6 +10,9 @@ $pageTitle = match ($currentPage) {
     'plots' => 'แปลงที่ดินทำกิน',
     'cases' => 'คำร้อง/เรื่องร้องเรียน',
     'map' => 'แผนที่',
+    'verification' => 'ตรวจสอบสิทธิ์',
+    'subdivision' => 'แบ่งแปลงที่ดิน',
+    'forms' => 'แบบฟอร์มราชการ',
     'reports' => 'รายงาน',
     'users' => 'จัดการผู้ใช้งาน',
     default => 'แดชบอร์ด',
@@ -40,7 +43,7 @@ $initials = mb_substr($_SESSION['full_name'] ?? 'U', 0, 1, 'UTF-8');
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
-    <?php if ($currentPage === 'map' || $currentPage === 'dashboard' || $currentPage === 'plots' || $currentPage === 'villages' || $currentPage === 'villagers'): ?>
+    <?php if ($currentPage === 'map' || $currentPage === 'dashboard' || $currentPage === 'plots' || $currentPage === 'villages' || $currentPage === 'villagers' || $currentPage === 'verification'): ?>
         <!-- Leaflet.js for Map -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -67,8 +70,23 @@ $initials = mb_substr($_SESSION['full_name'] ?? 'U', 0, 1, 'UTF-8');
         <!-- ===== Sidebar ===== -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="logo-icon">
-                    <i class="bi bi-tree-fill"></i>
+                <div class="logo-icon" style="background:none; width:44px; height:44px; display:flex; align-items:center; justify-content:center;">
+                    <svg viewBox="0 0 100 100" width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Shield shape -->
+                        <path d="M50 5 L90 20 L90 55 Q90 80 50 95 Q10 80 10 55 L10 20 Z" fill="#166534" stroke="#a7f3d0" stroke-width="2.5"/>
+                        <!-- Inner shield border -->
+                        <path d="M50 12 L83 24 L83 53 Q83 74 50 88 Q17 74 17 53 L17 24 Z" fill="none" stroke="#a7f3d0" stroke-width="1" opacity="0.5"/>
+                        <!-- Land plot grid -->
+                        <rect x="28" y="35" width="18" height="14" rx="1" fill="#4ade80" opacity="0.9"/>
+                        <rect x="49" y="35" width="22" height="14" rx="1" fill="#22c55e" opacity="0.8"/>
+                        <rect x="28" y="52" width="12" height="16" rx="1" fill="#22c55e" opacity="0.8"/>
+                        <rect x="43" y="52" width="16" height="16" rx="1" fill="#86efac" opacity="0.7"/>
+                        <rect x="62" y="52" width="9" height="16" rx="1" fill="#4ade80" opacity="0.9"/>
+                        <!-- Tree on top -->
+                        <polygon points="50,18 42,32 58,32" fill="#bbf7d0"/>
+                        <polygon points="50,23 44,34 56,34" fill="#86efac"/>
+                        <rect x="48" y="32" width="4" height="4" fill="#a7f3d0"/>
+                    </svg>
                 </div>
                 <div class="logo-text">
                     <h2>
@@ -115,6 +133,21 @@ $initials = mb_substr($_SESSION['full_name'] ?? 'U', 0, 1, 'UTF-8');
                 <a href="index.php?page=map" class="nav-item <?= $currentPage === 'map' ? 'active' : '' ?>">
                     <i class="bi bi-geo-alt-fill"></i>
                     <span>แผนที่</span>
+                </a>
+
+                <a href="index.php?page=verification" class="nav-item <?= $currentPage === 'verification' ? 'active' : '' ?>">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span>ตรวจสอบสิทธิ์</span>
+                </a>
+
+                <a href="index.php?page=subdivision" class="nav-item <?= $currentPage === 'subdivision' ? 'active' : '' ?>">
+                    <i class="bi bi-scissors"></i>
+                    <span>แบ่งแปลงที่ดิน</span>
+                </a>
+
+                <a href="index.php?page=forms" class="nav-item <?= $currentPage === 'forms' ? 'active' : '' ?>">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>แบบฟอร์มราชการ</span>
                 </a>
 
                 <a href="index.php?page=reports" class="nav-item <?= $currentPage === 'reports' ? 'active' : '' ?>">

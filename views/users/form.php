@@ -34,6 +34,7 @@ $u = $user ?? [];
     </div>
     <div class="card-body">
         <form method="POST" action="index.php?page=users&action=<?= $isEdit ? "edit&id=$id" : 'create' ?>">
+            <?= csrf_field() ?>
 
             <div class="form-row">
                 <div class="form-group">

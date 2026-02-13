@@ -105,6 +105,7 @@ class Plot
             document_type = :document_type, status = :status, survey_date = :survey_date,
             plot_image_path = :plot_image_path, notes = :notes,
             code_dnp = :code_dnp, apar_code = :apar_code, apar_no = :apar_no,
+            num_apar = :num_apar, spar_code = :spar_code,
             perimeter = :perimeter, ban_type = :ban_type,
             num_spar = :num_spar, spar_no = :spar_no, par_ban = :par_ban,
             par_moo = :par_moo, par_tam = :par_tam, par_amp = :par_amp,

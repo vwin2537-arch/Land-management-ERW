@@ -14,7 +14,7 @@ class DocumentController
     {
         if ($_SESSION['role'] === ROLE_VIEWER) {
             $_SESSION['flash_error'] = 'คุณไม่มีสิทธิ์อัปโหลด';
-            header('Location: ' . $_SERVER['HTTP_REFERER'] ?? 'index.php');
+            header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'index.php'));
             exit;
         }
 

@@ -8,7 +8,7 @@
 define('APP_NAME', 'ระบบจัดการที่ดินทำกิน');
 define('APP_SHORT_NAME', 'LandMS');
 define('APP_VERSION', '1.0.0');
-define('APP_SUBTITLE', 'อุทยานแห่งชาติ');
+define('APP_SUBTITLE', 'อุทยานแห่งชาติเอราวัณ');
 
 // Paths
 define('BASE_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
@@ -81,3 +81,36 @@ define('ROLE_LABELS', [
     'officer' => 'เจ้าหน้าที่',
     'viewer'  => 'ผู้ชม',
 ]);
+
+// ============================================================
+// CSRF Protection Helpers
+// ============================================================
+
+/**
+ * Generate or retrieve CSRF token for the current session
+ */
+function csrf_token(): string
+{
+    if (empty($_SESSION['_csrf_token'])) {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['_csrf_token'];
+}
+
+/**
+ * Output hidden input field with CSRF token (use inside forms)
+ */
+function csrf_field(): string
+{
+    return '<input type="hidden" name="_csrf_token" value="' . csrf_token() . '">';
+}
+
+/**
+ * Validate CSRF token from POST request
+ * @return bool true if valid
+ */
+function csrf_validate(): bool
+{
+    $token = $_POST['_csrf_token'] ?? '';
+    return !empty($token) && hash_equals($_SESSION['_csrf_token'] ?? '', $token);
+}

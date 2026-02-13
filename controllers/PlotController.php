@@ -3,12 +3,10 @@
  * PlotController — CRUD แปลงที่ดินทำกิน
  */
 
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../models/Plot.php';
-require_once __DIR__ . '/../models/Document.php';
 
-class PlotController
+class PlotController extends BaseController
 {
 
     public function store(): void
@@ -99,11 +97,6 @@ class PlotController
         exit;
     }
 
-    private function sanitize(array $post): array
-    {
-        return array_map(fn($v) => is_string($v) ? trim($v) : $v, $post);
-    }
-
     private function uploadPlotImage(array $file): ?string
     {
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -117,32 +110,4 @@ class PlotController
         return 'uploads/plot_images/' . $name;
     }
 
-    private function uploadDocuments(array $files, string $type, int $id): void
-    {
-        if (!isset($files['name']) || !is_array($files['name']))
-            return;
-        for ($i = 0; $i < count($files['name']); $i++) {
-            if ($files['error'][$i] !== UPLOAD_ERR_OK)
-                continue;
-            $single = ['name' => $files['name'][$i], 'tmp_name' => $files['tmp_name'][$i], 'size' => $files['size'][$i], 'error' => $files['error'][$i]];
-            Document::upload($single, $type, $id, $_POST['doc_category'] ?? 'other');
-        }
-    }
-
-    private function logActivity(string $action, string $table, int $rid, string $desc): void
-    {
-        try {
-            $db = getDB();
-            $db->prepare("INSERT INTO activity_logs (user_id,action,table_name,record_id,description,ip_address) VALUES (:u,:a,:t,:r,:d,:ip)")
-                ->execute(['u' => $_SESSION['user_id'], 'a' => $action, 't' => $table, 'r' => $rid, 'd' => $desc, 'ip' => $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1']);
-        } catch (PDOException $e) {
-        }
-    }
-
-    private function forbidden(): void
-    {
-        $_SESSION['flash_error'] = 'คุณไม่มีสิทธิ์ดำเนินการนี้';
-        header('Location: index.php?page=plots');
-        exit;
-    }
 }

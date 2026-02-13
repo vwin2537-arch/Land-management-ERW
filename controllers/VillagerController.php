@@ -3,12 +3,10 @@
  * VillagerController — CRUD ราษฎร
  */
 
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../models/Villager.php';
-require_once __DIR__ . '/../models/Document.php';
 
-class VillagerController
+class VillagerController extends BaseController
 {
 
     /**
@@ -110,12 +108,6 @@ class VillagerController
 
     // --- Helpers ---
 
-    private function sanitize(array $post): array
-    {
-        return array_map(function ($v) {
-            return is_string($v) ? trim($v) : $v; }, $post);
-    }
-
     private function uploadPhoto(array $file): ?string
     {
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -131,46 +123,4 @@ class VillagerController
         return 'uploads/photos/' . $name;
     }
 
-    private function uploadDocuments(array $files, string $type, int $id): void
-    {
-        if (!isset($files['name']) || !is_array($files['name']))
-            return;
-        for ($i = 0; $i < count($files['name']); $i++) {
-            if ($files['error'][$i] !== UPLOAD_ERR_OK)
-                continue;
-            $single = [
-                'name' => $files['name'][$i],
-                'tmp_name' => $files['tmp_name'][$i],
-                'size' => $files['size'][$i],
-                'error' => $files['error'][$i],
-            ];
-            $category = $_POST['doc_category'] ?? 'other';
-            Document::upload($single, $type, $id, $category);
-        }
-    }
-
-    private function logActivity(string $action, string $table, int $recordId, string $desc): void
-    {
-        try {
-            $db = getDB();
-            $stmt = $db->prepare("INSERT INTO activity_logs (user_id, action, table_name, record_id, description, ip_address) 
-                                  VALUES (:uid, :action, :tbl, :rid, :desc, :ip)");
-            $stmt->execute([
-                'uid' => $_SESSION['user_id'],
-                'action' => $action,
-                'tbl' => $table,
-                'rid' => $recordId,
-                'desc' => $desc,
-                'ip' => $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
-            ]);
-        } catch (PDOException $e) {
-        }
-    }
-
-    private function forbidden(): void
-    {
-        $_SESSION['flash_error'] = 'คุณไม่มีสิทธิ์ดำเนินการนี้';
-        header('Location: index.php?page=villagers');
-        exit;
-    }
 }

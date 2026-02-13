@@ -150,7 +150,7 @@ $villagers = Villager::getAll($search, $sortBy, ITEMS_PER_PAGE, $offset);
                 <div class="card-footer">
                     <div class="pagination">
                         <?php if ($page_num > 1): ?>
-                            <a href="index.php?page=villagers&p=<?= $page_num - 1 ?>&search=<?= urlencode($search) ?>">
+                            <a href="index.php?page=villagers&p=<?= $page_num - 1 ?>&search=<?= urlencode($search) ?>&sort=<?= urlencode($sortBy) ?>">
                                 <i class="bi bi-chevron-left"></i>
                             </a>
                         <?php endif; ?>
@@ -161,14 +161,14 @@ $villagers = Villager::getAll($search, $sortBy, ITEMS_PER_PAGE, $offset);
                                     <?= $p ?>
                                 </span>
                             <?php else: ?>
-                                <a href="index.php?page=villagers&p=<?= $p ?>&search=<?= urlencode($search) ?>">
+                                <a href="index.php?page=villagers&p=<?= $p ?>&search=<?= urlencode($search) ?>&sort=<?= urlencode($sortBy) ?>">
                                     <?= $p ?>
                                 </a>
                             <?php endif; ?>
                         <?php endfor; ?>
 
                         <?php if ($page_num < $totalPages): ?>
-                            <a href="index.php?page=villagers&p=<?= $page_num + 1 ?>&search=<?= urlencode($search) ?>">
+                            <a href="index.php?page=villagers&p=<?= $page_num + 1 ?>&search=<?= urlencode($search) ?>&sort=<?= urlencode($sortBy) ?>">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
                         <?php endif; ?>

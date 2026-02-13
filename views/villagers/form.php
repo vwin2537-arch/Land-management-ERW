@@ -37,6 +37,7 @@ $v = $villager ?? []; // shorthand
     <div class="card-body">
         <form method="POST" action="index.php?page=villagers&action=<?= $isEdit ? "edit&id=$id" : 'create' ?>"
             enctype="multipart/form-data" id="villagerForm">
+            <?= csrf_field() ?>
 
             <!-- ข้อมูลส่วนตัว -->
             <h4
@@ -177,15 +178,16 @@ $v = $villager ?? []; // shorthand
                     <?= $isEdit ? 'บันทึกการแก้ไข' : 'เพิ่มราษฎร' ?>
                 </button>
                 <a href="index.php?page=villagers" class="btn btn-secondary">ยกเลิก</a>
-
-                <?php if ($isEdit && $_SESSION['role'] === ROLE_ADMIN): ?>
-                    <form method="POST" action="index.php?page=villagers&action=delete&id=<?= $id ?>"
-                        style="margin-left:auto;"
-                        onsubmit="return confirmDelete('คุณต้องการลบราษฎรนี้? ข้อมูลแปลงที่ดินที่เกี่ยวข้องจะถูกลบไปด้วย')">
-                        <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> ลบ</button>
-                    </form>
-                <?php endif; ?>
             </div>
         </form>
+
+        <?php if ($isEdit && $_SESSION['role'] === ROLE_ADMIN): ?>
+            <form method="POST" action="index.php?page=villagers&action=delete&id=<?= $id ?>"
+                style="margin-top:12px; padding-top:16px; border-top:1px solid var(--gray-100); display:flex; justify-content:flex-end;"
+                onsubmit="return confirmDelete('คุณต้องการลบราษฎรนี้? ข้อมูลแปลงที่ดินที่เกี่ยวข้องจะถูกลบไปด้วย')">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> ลบราษฎร</button>
+            </form>
+        <?php endif; ?>
     </div>
 </div>

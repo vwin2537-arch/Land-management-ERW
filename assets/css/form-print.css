@@ -1,0 +1,287 @@
+/* ============================================================
+   Form Print Styles — แบบฟอร์มราชการ
+   ============================================================ */
+
+@page {
+    size: A4 landscape;
+    margin: 12mm 10mm;
+}
+
+* { box-sizing: border-box; }
+
+body.form-print {
+    font-family: 'TH Sarabun New', 'Sarabun', 'Tahoma', sans-serif;
+    font-size: 14pt;
+    line-height: 1.4;
+    color: #000;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+body.form-print-portrait {
+    font-family: 'TH Sarabun New', 'Sarabun', 'Tahoma', sans-serif;
+    font-size: 14pt;
+    line-height: 1.4;
+    color: #000;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+@page portrait { size: A4 portrait; margin: 15mm; }
+body.form-print-portrait { page: portrait; }
+
+/* ---- Toolbar (hide on print) ---- */
+.form-toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #1e40af;
+    color: #fff;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.form-toolbar h2 { font-size: 16pt; margin: 0; font-weight: 600; }
+.form-toolbar .btn-group { display: flex; gap: 8px; }
+.form-toolbar .btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12pt;
+    font-family: inherit;
+    font-weight: 600;
+}
+.form-toolbar .btn-print {
+    background: #22c55e;
+    color: #fff;
+}
+.form-toolbar .btn-back {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+}
+
+@media print {
+    .form-toolbar { display: none !important; }
+    .form-page { page-break-after: always; page-break-inside: avoid; }
+    .form-page:last-child { page-break-after: auto; }
+}
+
+/* ---- Form container ---- */
+.form-page {
+    max-width: 290mm;
+    margin: 60px auto 30px;
+    padding: 20px;
+    background: #fff;
+}
+@media print {
+    .form-page {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    .form-page .form-notes {
+        margin-top: auto;
+    }
+}
+
+/* ---- Header ---- */
+.form-header {
+    text-align: center;
+    margin-bottom: 12px;
+}
+.form-header .form-code {
+    float: right;
+    font-size: 13pt;
+    font-weight: 600;
+    color: #555;
+}
+.form-header h1 {
+    font-size: 16pt;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+.form-header .form-subtitle {
+    font-size: 13pt;
+    color: #333;
+    margin: 2px 0;
+}
+.form-header .form-meta {
+    font-size: 13pt;
+    margin: 4px 0;
+}
+.form-header .underline-fill {
+    border-bottom: 1px dotted #000;
+    display: inline-block;
+    min-width: 100px;
+    padding: 0 4px;
+    font-weight: 600;
+}
+
+/* ---- Data Table ---- */
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13pt;
+    margin-top: 8px;
+    table-layout: fixed;
+}
+.form-table th,
+.form-table td {
+    border: 1px solid #000;
+    padding: 3px 6px;
+    text-align: center;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+.form-table thead th {
+    background: #f0f0f0;
+    font-weight: 700;
+    font-size: 12pt;
+}
+@media print {
+    .form-table thead th { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+.form-table tbody td {
+    font-size: 13pt;
+}
+.form-table tbody td.text-left {
+    text-align: left;
+    padding-left: 8px;
+}
+.form-table tbody td.text-right {
+    text-align: right;
+    padding-right: 8px;
+}
+.form-table tfoot td {
+    font-weight: 700;
+    font-size: 13pt;
+    border: 1px solid #000;
+    padding: 4px 6px;
+}
+
+/* ---- Footer / Signatures ---- */
+.form-footer {
+    margin-top: 16px;
+    font-size: 13pt;
+}
+.form-footer .summary-section {
+    margin-bottom: 12px;
+    line-height: 1.8;
+}
+.form-footer .summary-section span.count {
+    display: inline-block;
+    min-width: 30px;
+    border-bottom: 1px dotted #000;
+    text-align: center;
+    font-weight: 600;
+}
+.form-signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 20px;
+}
+.form-signatures .sig-box {
+    flex: 1;
+    text-align: center;
+    font-size: 13pt;
+    line-height: 1.15;
+}
+.form-signatures .sig-box p {
+    margin: 0;
+    padding: 0;
+}
+.form-signatures .sig-box p:first-child {
+    margin-top: 24px;
+}
+.form-signatures .sig-label {
+    margin-top: 1px;
+    font-size: 13pt;
+    color: #333;
+}
+
+/* ---- Notes section ---- */
+.form-notes {
+    margin-top: 6px;
+    font-size: 10pt;
+    line-height: 1.25;
+    color: #333;
+    border-top: 1px solid #999;
+    padding-top: 3px;
+}
+.form-notes h4 {
+    font-size: 11pt;
+    margin: 0 0 2px;
+    font-weight: 700;
+}
+.form-notes ol {
+    margin: 0;
+    padding-left: 14px;
+}
+.form-notes ol li {
+    margin-bottom: 1px;
+}
+
+/* ---- Self-Cert (Portrait) ---- */
+.cert-body {
+    font-size: 15pt;
+    line-height: 1.8;
+    text-indent: 40px;
+}
+.cert-body .field {
+    border-bottom: 1px dotted #000;
+    display: inline-block;
+    min-width: 80px;
+    padding: 0 4px;
+    text-indent: 0;
+    font-weight: 600;
+}
+.cert-body .field-long {
+    border-bottom: 1px dotted #000;
+    display: inline-block;
+    min-width: 200px;
+    padding: 0 4px;
+    text-indent: 0;
+    font-weight: 600;
+}
+.cert-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 12px 40px;
+    font-size: 14pt;
+}
+.cert-checklist li {
+    margin-bottom: 4px;
+    padding-left: 28px;
+    position: relative;
+}
+.cert-checklist li::before {
+    content: '☑';
+    position: absolute;
+    left: 0;
+    font-size: 16pt;
+}
+.cert-checklist li.unchecked::before {
+    content: '☐';
+}
+
+/* ---- Screen preview shadow ---- */
+@media screen {
+    .form-page {
+        box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+    }
+}

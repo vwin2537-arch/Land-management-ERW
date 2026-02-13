@@ -178,6 +178,7 @@ $c = $case;
                         <?php if ($_SESSION['role'] !== ROLE_VIEWER): ?>
                             <form method="POST" action="index.php?page=documents&action=delete&id=<?= $doc['doc_id'] ?>"
                                 onsubmit="return confirmDelete('ลบเอกสาร?')">
+                                <?= csrf_field() ?>
                                 <button class="btn btn-danger btn-sm" style="padding:4px 8px;"><i class="bi bi-trash"></i></button>
                             </form>
                         <?php endif; ?>
@@ -197,6 +198,7 @@ $c = $case;
                     class="bi bi-x-lg"></i></button>
         </div>
         <form method="POST" action="index.php?page=documents&action=upload" enctype="multipart/form-data">
+            <?= csrf_field() ?>
             <div class="modal-body">
                 <input type="hidden" name="related_type" value="case">
                 <input type="hidden" name="related_id" value="<?= $id ?>">

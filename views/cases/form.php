@@ -53,6 +53,7 @@ if (!empty($c['villager_id'])) {
     <div class="card-body">
         <form method="POST" action="index.php?page=cases&action=<?= $isEdit ? "edit&id=$id" : 'create' ?>"
             enctype="multipart/form-data">
+            <?= csrf_field() ?>
 
             <div class="form-row">
                 <div class="form-group">

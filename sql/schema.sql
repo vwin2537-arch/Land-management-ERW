@@ -85,6 +85,25 @@ CREATE TABLE IF NOT EXISTS land_plots (
     surveyed_by      INT,
     plot_image_path  VARCHAR(500),
     notes            TEXT,
+    -- Shapefile / DNP fields (ข้อมูลจากแผนที่กรมอุทยานฯ)
+    code_dnp         VARCHAR(20),
+    apar_code        VARCHAR(20),
+    apar_no          VARCHAR(20),
+    num_apar         VARCHAR(20),
+    spar_code        VARCHAR(20),
+    ban_e            VARCHAR(20),
+    perimeter        DECIMAL(12,2) DEFAULT 0,
+    ban_type         VARCHAR(50),
+    num_spar         VARCHAR(20),
+    spar_no          VARCHAR(20),
+    par_ban          VARCHAR(100),
+    par_moo          VARCHAR(20),
+    par_tam          VARCHAR(100),
+    par_amp          VARCHAR(100),
+    par_prov         VARCHAR(100),
+    ptype            VARCHAR(50),
+    target_fid       INT,
+    data_issues      TEXT,
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at       DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (villager_id) REFERENCES villagers(villager_id) ON DELETE CASCADE,
@@ -94,7 +113,9 @@ CREATE TABLE IF NOT EXISTS land_plots (
     INDEX idx_status (status),
     INDEX idx_coords (latitude, longitude),
     INDEX idx_park (park_name),
-    INDEX idx_zone (zone)
+    INDEX idx_zone (zone),
+    INDEX idx_ban_e (ban_e),
+    INDEX idx_par_ban (par_ban)
 ) ENGINE=InnoDB;
 
 -- ============================================================
@@ -177,6 +198,44 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     INDEX idx_user_action (user_id, action),
     INDEX idx_created (created_at)
 ) ENGINE=InnoDB;
+
+-- ============================================================
+-- 8. ตาราง household_members (สมาชิกครอบครัว/ครัวเรือน - อส.6-2)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS household_members (
+    member_id       INT AUTO_INCREMENT PRIMARY KEY,
+    villager_id     INT NOT NULL,
+    prefix          VARCHAR(20),
+    first_name      VARCHAR(100) NOT NULL,
+    last_name       VARCHAR(100) NOT NULL,
+    id_card_number  VARCHAR(13),
+    relationship    VARCHAR(50),
+    notes           TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (villager_id) REFERENCES villagers(villager_id) ON DELETE CASCADE,
+    INDEX idx_villager (villager_id)
+) ENGINE=InnoDB;
+
+-- ============================================================
+-- ALTER: เพิ่มฟิลด์คุณสมบัติ (qualification) ใน villagers
+-- ============================================================
+ALTER TABLE villagers
+    ADD COLUMN qualification_status ENUM('pending','passed','failed') DEFAULT 'pending' AFTER notes,
+    ADD COLUMN qual_thai_nationality TINYINT(1) DEFAULT 1 AFTER qualification_status,
+    ADD COLUMN qual_continuous_residence TINYINT(1) DEFAULT 1 AFTER qual_thai_nationality,
+    ADD COLUMN qual_no_other_land TINYINT(1) DEFAULT 1 AFTER qual_continuous_residence,
+    ADD COLUMN qual_no_court_order TINYINT(1) DEFAULT 1 AFTER qual_no_other_land,
+    ADD COLUMN qual_no_forest_crime TINYINT(1) DEFAULT 1 AFTER qual_no_court_order,
+    ADD COLUMN qual_no_revoked_rights TINYINT(1) DEFAULT 1 AFTER qual_no_forest_crime,
+    ADD COLUMN qualification_date DATE AFTER qual_no_revoked_rights,
+    ADD COLUMN qualification_notes TEXT AFTER qualification_date;
+
+-- ============================================================
+-- ALTER: เพิ่มฟิลด์ remark/watershed ใน land_plots
+-- ============================================================
+ALTER TABLE land_plots
+    ADD COLUMN remark_risk ENUM('not_risky','risky','risky_case','not_risky_case') DEFAULT 'not_risky' AFTER notes,
+    ADD COLUMN watershed_class VARCHAR(20) AFTER remark_risk;
 
 -- ============================================================
 -- ข้อมูลเริ่มต้น (Seed Data)

@@ -284,6 +284,7 @@ $statusColor = PLOT_STATUS_COLORS[$p['status']] ?? '#6b7280';
                         <?php if ($_SESSION['role'] !== ROLE_VIEWER): ?>
                             <form method="POST" action="index.php?page=documents&action=delete&id=<?= $doc['doc_id'] ?>"
                                 style="margin-top:4px;" onsubmit="return confirmDelete('ลบ?')">
+                                <?= csrf_field() ?>
                                 <button class="btn btn-danger btn-sm" style="padding:4px 10px; font-size:11px;"><i
                                         class="bi bi-trash"></i></button>
                             </form>
@@ -304,6 +305,7 @@ $statusColor = PLOT_STATUS_COLORS[$p['status']] ?? '#6b7280';
                     class="bi bi-x-lg"></i></button>
         </div>
         <form method="POST" action="index.php?page=documents&action=upload" enctype="multipart/form-data">
+            <?= csrf_field() ?>
             <div class="modal-body">
                 <input type="hidden" name="related_type" value="plot">
                 <input type="hidden" name="related_id" value="<?= $id ?>">

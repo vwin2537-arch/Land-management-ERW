@@ -43,6 +43,7 @@ $preVillagerId = $_GET['villager_id'] ?? ($p['villager_id'] ?? '');
     <div class="card-body">
         <form method="POST" action="index.php?page=plots&action=<?= $isEdit ? "edit&id=$id" : 'create' ?>"
             enctype="multipart/form-data" id="plotForm">
+            <?= csrf_field() ?>
 
             <!-- ข้อมูลแปลง -->
             <h4
@@ -359,14 +360,17 @@ $preVillagerId = $_GET['villager_id'] ?? ($p['villager_id'] ?? '');
                     <?= $isEdit ? 'บันทึกการแก้ไข' : 'เพิ่มแปลงที่ดิน' ?>
                 </button>
                 <a href="index.php?page=plots" class="btn btn-secondary">ยกเลิก</a>
-                <?php if ($isEdit && $_SESSION['role'] === ROLE_ADMIN): ?>
-                    <form method="POST" action="index.php?page=plots&action=delete&id=<?= $id ?>" style="margin-left:auto;"
-                        onsubmit="return confirmDelete('ลบแปลงที่ดินนี้?')">
-                        <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> ลบ</button>
-                    </form>
-                <?php endif; ?>
             </div>
         </form>
+
+        <?php if ($isEdit && $_SESSION['role'] === ROLE_ADMIN): ?>
+            <form method="POST" action="index.php?page=plots&action=delete&id=<?= $id ?>"
+                style="margin-top:12px; padding-top:16px; border-top:1px solid var(--gray-100); display:flex; justify-content:flex-end;"
+                onsubmit="return confirmDelete('ลบแปลงที่ดินนี้?')">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> ลบแปลง</button>
+            </form>
+        <?php endif; ?>
     </div>
 </div>
 

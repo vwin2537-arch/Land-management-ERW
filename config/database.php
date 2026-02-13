@@ -4,6 +4,26 @@
  * ระบบจัดการที่ดินทำกินในเขตอุทยานแห่งชาติ
  */
 
+// Load .env file if present (for local development)
+$envFile = dirname(__DIR__) . DIRECTORY_SEPARATOR . '.env';
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#')) {
+            continue;
+        }
+        if (str_contains($line, '=')) {
+            [$key, $value] = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            if (!getenv($key)) {
+                putenv("$key=$value");
+            }
+        }
+    }
+}
+
 // Railway: parse MYSQL_URL if available
 $mysql_url = getenv('MYSQL_URL') ?: getenv('MYSQLDATABASE_URL');
 $p = $mysql_url ? parse_url($mysql_url) : null;

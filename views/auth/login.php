@@ -91,18 +91,10 @@
         .login-logo .icon-circle {
             width: 80px;
             height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #16a34a, #15803d);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 16px;
-            box-shadow: 0 8px 24px rgba(22, 163, 74, 0.35);
-        }
-
-        .login-logo .icon-circle i {
-            font-size: 36px;
-            color: white;
         }
 
         .login-logo h1 {
@@ -236,8 +228,19 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-logo">
-                <div class="icon-circle">
-                    <i class="bi bi-tree-fill"></i>
+                <div class="icon-circle" style="background:none; width:80px; height:80px; display:flex; align-items:center; justify-content:center;">
+                    <svg viewBox="0 0 100 100" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 5 L90 20 L90 55 Q90 80 50 95 Q10 80 10 55 L10 20 Z" fill="#166534" stroke="#a7f3d0" stroke-width="2.5"/>
+                        <path d="M50 12 L83 24 L83 53 Q83 74 50 88 Q17 74 17 53 L17 24 Z" fill="none" stroke="#a7f3d0" stroke-width="1" opacity="0.5"/>
+                        <rect x="28" y="35" width="18" height="14" rx="1" fill="#4ade80" opacity="0.9"/>
+                        <rect x="49" y="35" width="22" height="14" rx="1" fill="#22c55e" opacity="0.8"/>
+                        <rect x="28" y="52" width="12" height="16" rx="1" fill="#22c55e" opacity="0.8"/>
+                        <rect x="43" y="52" width="16" height="16" rx="1" fill="#86efac" opacity="0.7"/>
+                        <rect x="62" y="52" width="9" height="16" rx="1" fill="#4ade80" opacity="0.9"/>
+                        <polygon points="50,18 42,32 58,32" fill="#bbf7d0"/>
+                        <polygon points="50,23 44,34 56,34" fill="#86efac"/>
+                        <rect x="48" y="32" width="4" height="4" fill="#a7f3d0"/>
+                    </svg>
                 </div>
                 <h1>
                     <?= APP_NAME ?>

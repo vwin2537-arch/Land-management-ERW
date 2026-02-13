@@ -1,0 +1,70 @@
+=== UPSERT ตารางแปลงสอบทาน2.xlsx → DB ===
+DB: 127.0.0.1:3306/land_management
+Loading xlsx...
+Sheet: แก้ไข 13ก.พ.69, rows=1180, cols=39
+Loaded 1180 rows into memory
+Header row: 1
+Columns found: 39
+  FID = col 1
+  SHAPE * = col 2
+  TARGET_FID = col 3
+  NAME_DNP_T = col 4
+  NAME_DNP = col 5
+  CODE_DNP = col 6
+  APAR_CODE = col 7
+  APAR_NO = col 8
+  NUM_APAR = col 9
+  SPAR_CODE = col 10
+  SPAR_NO = col 11
+  NUM_SPAR = col 12
+  E = col 13
+  N = col 14
+  PAR_BAN = col 15
+  BAN_E = col 16
+  PAR_MOO = col 17
+  PAR_TAM = col 18
+  PAR_AMP = col 19
+  PAR_PROV = col 20
+  NAME_TITLE = col 21
+  NAME = col 22
+  SURNAME = col 23
+  IDCARD = col 24
+  HOME_NO = col 25
+  HOME_BAN = col 26
+  HOME_MOO = col 27
+  HOME_TAM = col 28
+  HOME_AMP = col 29
+  HOME_PROV = col 30
+  PERIMETER = col 31
+  AREA_RAI = col 32
+  RAI = col 33
+  NGAN = col 34
+  WA_SQ = col 35
+  REMARK = col 36
+  BAN_TYPE = col 37
+  YEAR = col 38
+  PTYPE = col 39
+Connecting to 127.0.0.1:3306/land_management ...
+Connected!
+Data rows: 1179
+  Processing 200/1179 ...
+  Processing 400/1179 ...
+  Processing 600/1179 ...
+  Processing 800/1179 ...
+  Processing 1000/1179 ...
+
+==================================================
+✅ UPSERT สำเร็จ!
+   ราษฎรสร้างใหม่:    5
+   ราษฎรอัพเดท:       1174
+   แปลงสร้างใหม่:     0
+   แปลงอัพเดท:        1179
+   ข้ามแถวว่าง:       0
+   ข้อผิดพลาด:        0
+
+   [DB] villagers ทั้งหมด: 753
+   [DB] land_plots ทั้งหมด: 1179
+   [DB] แปลงมีปัญหา: 87
+==================================================
+
+Done!
