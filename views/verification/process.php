@@ -664,16 +664,7 @@ function initMap() {
     if (!mapEl || typeof L === 'undefined') return;
 
     const map = L.map('allocMap', { scrollWheelZoom: true });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OSM',
-        maxZoom: 19
-    }).addTo(map);
-
-    // Satellite layer option
-    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: '© Esri'
-    });
-    L.control.layers({ 'แผนที่': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'), 'ดาวเทียม': satellite }).addTo(map);
+    addMapLayers(map, { defaultBase: 'osm' });
 
     const bounds = [];
     PLOTS.forEach(p => {

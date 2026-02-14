@@ -1,7 +1,7 @@
 # SETUP GUIDE — ระบบจัดการที่ดินทำกิน (LandMS)
 
 > **ไฟล์นี้สำหรับ AI หรือ Developer อ่านไฟล์เดียวแล้วเซ็ตอัพโปรเจคได้ทันที**
-> อัพเดทล่าสุด: 2026-02-14 (v4 — เพิ่ม Railway Deploy Guide + Troubleshooting)
+> อัพเดทล่าสุด: 2026-02-14 (v5 — เพิ่มขอบเขตอุทยานฯ + Unified Map Layers)
 
 ---
 
@@ -55,7 +55,8 @@ PHP_SQL/
 │   └── villages/
 ├── assets/
 │   ├── css/style.css        ← Main CSS
-│   └── css/form-print.css   ← CSS สำหรับพิมพ์ฟอร์มราชการ (table-layout: fixed)
+│   ├── css/form-print.css   ← CSS สำหรับพิมพ์ฟอร์มราชการ (table-layout: fixed)
+│   └── js/map-popup.js      ← Shared map functions: plotPopupHtml() + addMapLayers()
 ├── tools/
 │   ├── import_shapefile.php   ← Import จาก .dbf (Shapefile) เข้า villagers + land_plots
 │   ├── inspect_xlsx.py        ← ตรวจสอบความถูกต้อง Excel (เลขบัตร, ชื่อ, artifact)
@@ -79,8 +80,13 @@ PHP_SQL/
 ├── setup.php               ← Web-based DB setup (สำหรับ Railway deploy)
 ├── composer.json            ← Dependencies (แค่ ext-pdo_mysql)
 ├── Dockerfile               ← สำหรับ Railway deploy
-├── manifest.json            ← PWA manifest
-└── sw.js                    ← Service Worker (PWA)
+├── data/
+│   ├── erawan_boundary.geojson  ← ขอบเขตอุทยานฯ เอราวัณ (แปลงจาก SHP→GeoJSON)
+│   └── plots_boundaries.geojson ← ขอบเขตแปลงที่ดิน (GeoJSON)
+├── MAP_ERW/                     ← Shapefile ขอบเขตอุทยานฯ (ต้นฉบับ)
+├── convert_shp.js               ← Script แปลง SHP→GeoJSON (Node.js, ใช้ครั้งเดียว)
+├── manifest.json                ← PWA manifest
+└── sw.js                        ← Service Worker (PWA)
 ```
 
 ---
@@ -375,7 +381,60 @@ DB_NAME=land_management
 **`self_cert_heir.php` — หนังสือรับรอง (ทายาท)** ✅ ใช้งานได้
 - ⚠️ ยังไม่มีเลขบัตรทายาท / วันเกิด (ปรับภายหลังได้)
 
-### 6.4 Routing (index.php)
+### 6.4 แผนที่ (Leaflet.js) — Map Features
+
+#### Shared Functions (`assets/js/map-popup.js`)
+
+ไฟล์นี้ถูก include ในทุกหน้าที่โหลด Leaflet.js (ผ่าน `views/layout/header.php`) มี 2 function:
+
+| Function | หน้าที่ |
+|----------|--------|
+| `plotPopupHtml(opts)` | สร้าง HTML popup สำหรับแปลงที่ดิน (รหัสแปลง, เจ้าของ, เนื้อที่, สถานะ) |
+| `addMapLayers(map, opts)` | เพิ่ม base layer switcher (3 แบบ) + ขอบเขตอุทยานฯ ให้แผนที่ |
+
+#### `addMapLayers(map, opts)` — ใช้ในทุกหน้าที่มีแผนที่
+
+```js
+// ตัวอย่างการใช้งาน
+const map = L.map('myMap').setView([14.3, 99.0], 12);
+addMapLayers(map, { defaultBase: 'satellite' });
+// → เพิ่ม 3 base layers (ปกติ/ดาวเทียม/ภูมิประเทศ) + ขอบเขตอุทยานฯ + Layer Control
+
+// หน้าที่มี overlay เพิ่มเติม
+addMapLayers(map, {
+    defaultBase: 'osm',
+    extraOverlays: { 'ขอบเขตแปลง': plotBoundaryLayer }
+});
+```
+
+**Parameters:**
+- `defaultBase` — `'osm'` | `'satellite'` | `'topo'` (default: `'satellite'`)
+- `showPark` — แสดงขอบเขตอุทยานฯ เป็นค่าเริ่มต้น (default: `true`)
+- `extraOverlays` — overlay เพิ่มเติมเช่น `{ 'ขอบเขตแปลง': someLayerGroup }`
+
+#### หน้าที่มีแผนที่ (5 หน้า) — ทั้งหมดใช้ `addMapLayers()`
+
+| หน้า | Base Map | ขอบเขตอุทยานฯ | Overlay เพิ่ม |
+|------|:--------:|:-------------:|:-------------:|
+| `views/map/index.php` | OSM (default) | ✅ toggle | + ขอบเขตแปลง |
+| `views/plots/detail.php` | ดาวเทียม | ✅ toggle | — |
+| `views/villagers/detail.php` | ดาวเทียม | ✅ toggle | — |
+| `views/villages/detail.php` | ดาวเทียม | ✅ toggle | — |
+| `views/verification/process.php` | OSM | ✅ toggle | — |
+
+#### ขอบเขตอุทยานแห่งชาติเอราวัณ
+
+- **ต้นฉบับ**: `MAP_ERW/NPRK_1012(เอราวัณ)_DNP_WGS1984.shp` (UTM Zone 47N)
+- **แปลงด้วย**: `convert_shp.js` (Node.js + shapefile + proj4) — reproject UTM→WGS84
+- **ผลลัพธ์**: `data/erawan_boundary.geojson` (54.6 KB, 1 polygon, 2818 จุด)
+- **สไตล์**: เส้นประสีฟ้า (`#0ea5e9`), พื้นจางมาก (opacity 5%), มี popup ชื่ออุทยาน
+- **วิธีแปลงใหม่** (ถ้าได้ shapefile ใหม่):
+```powershell
+cmd /c "npm install shapefile proj4"   # ติดตั้งครั้งแรก
+cmd /c "node convert_shp.js"           # แปลง SHP → GeoJSON
+```
+
+### 6.5 Routing (index.php)
 - ใช้ `$_GET['page']` + `$_GET['action']` — ไม่มี framework router
 - POST handlers อยู่ก่อน layout render
 - Form print pages (`page=forms&action=print&type=form61`) ไม่ใช้ layout (standalone HTML)

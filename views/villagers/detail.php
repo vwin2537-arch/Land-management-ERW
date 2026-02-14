@@ -231,11 +231,13 @@ if (!empty($plotsWithCoords)):
             'lng' => (float)$p['longitude'],
             'area_rai' => $p['area_rai'],
             'area_ngan' => $p['area_ngan'],
+            'area_sqwa' => $p['area_sqwa'],
             'status' => $p['status'],
             'land_use' => LAND_USE_LABELS[$p['land_use_type']] ?? $p['land_use_type'],
             'polygon' => $p['polygon_coords'] ?? null,
         ];
     }, $plotsWithCoords))) ?>;
+    const ownerName = <?= json_encode(($v['prefix'] ?? '') . $v['first_name'] . ' ' . $v['last_name']) ?>;
 
     const statusColors = {
         'surveyed': '#22c55e',
@@ -248,10 +250,7 @@ if (!empty($plotsWithCoords)):
     const statusLabels = <?= json_encode(PLOT_STATUS_LABELS) ?>;
 
     const map = L.map('villagerPlotsMap').setView([plotsData[0].lat, plotsData[0].lng], 14);
-    
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19, attribution: '© Esri'
-    }).addTo(map);
+    addMapLayers(map, { defaultBase: 'satellite' });
 
     const bounds = L.latLngBounds();
     const plotColors = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
@@ -273,23 +272,17 @@ if (!empty($plotsWithCoords)):
                         fillColor: color
                     }).addTo(map);
                     
-                    poly.bindPopup(`
-                        <div style="font-family:Prompt; min-width:180px;">
-                            <strong style="font-size:14px; color:${color};">${plot.code}</strong>
-                            <hr style="margin:6px 0; border:0; border-top:1px solid #eee;">
-                            <div style="font-size:12px;">
-                                <div style="margin:3px 0;">📐 ${plot.area_rai} ไร่ ${plot.area_ngan} งาน</div>
-                                <div style="margin:3px 0;">🌾 ${plot.land_use}</div>
-                                <div style="margin:3px 0;">
-                                    <span style="display:inline-block; padding:2px 8px; border-radius:4px; background:${statusColor}; color:white; font-size:11px;">${statusLabel}</span>
-                                </div>
-                            </div>
-                            <a href="index.php?page=plots&action=view&id=${plot.id}" 
-                               style="display:block; text-align:center; margin-top:8px; padding:4px; background:${color}; color:white; border-radius:4px; text-decoration:none; font-size:12px;">
-                                ดูรายละเอียดแปลง →
-                            </a>
-                        </div>
-                    `);
+                    poly.bindPopup(plotPopupHtml({
+                        plotCode: plot.code,
+                        ownerName: ownerName,
+                        areaRai: plot.area_rai,
+                        areaNgan: plot.area_ngan,
+                        areaSqwa: plot.area_sqwa,
+                        statusLabel: statusLabel,
+                        statusColor: statusColor,
+                        plotId: plot.id,
+                        accentColor: color
+                    }));
                     bounds.extend(poly.getBounds());
                 }
             } catch (e) {

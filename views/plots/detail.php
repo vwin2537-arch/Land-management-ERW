@@ -224,11 +224,18 @@ $statusColor = PLOT_STATUS_COLORS[$p['status']] ?? '#6b7280';
             </div>
             <script>
                 const dMap = L.map('detailMap').setView([<?= $p['latitude'] ?>, <?= $p['longitude'] ?>], 15);
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    maxZoom: 19, attribution: '© Esri'
-                }).addTo(dMap);
+                addMapLayers(dMap, { defaultBase: 'satellite' });
                 L.marker([<?= $p['latitude'] ?>, <?= $p['longitude'] ?>]).addTo(dMap)
-                    .bindPopup('<b><?= htmlspecialchars($p['plot_code']) ?></b>').openPopup();
+                    .bindPopup(plotPopupHtml({
+                        plotCode: <?= json_encode($p['plot_code']) ?>,
+                        ownerName: <?= json_encode(($p['prefix'] ?? '') . $p['first_name'] . ' ' . $p['last_name']) ?>,
+                        areaRai: <?= (int)$p['area_rai'] ?>,
+                        areaNgan: <?= (int)$p['area_ngan'] ?>,
+                        areaSqwa: <?= (float)$p['area_sqwa'] ?>,
+                        statusLabel: <?= json_encode(PLOT_STATUS_LABELS[$p['status']] ?? $p['status']) ?>,
+                        statusColor: '<?= $statusColor ?>',
+                        accentColor: '<?= $statusColor ?>'
+                    })).openPopup();
 
                 <?php if ($p['polygon_coords']): ?>
                     try {

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "proj4": "^2.20.2",
+    "shapefile": "^0.6.6"
+  }
+}

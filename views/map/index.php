@@ -146,71 +146,47 @@ $plotsJson = json_encode($allPlots, JSON_UNESCAPED_UNICODE);
     // ===== Initialize Map =====
     const map = L.map('map').setView([13.75, 100.5], 6); // Thailand center
 
-    // Base layers
-    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19,
+    // ===== Overlay: ขอบเขตแปลงที่ดิน (GeoJSON) =====
+    const plotBoundaryLayer = L.layerGroup();
+    const geojsonUrl = '<?= rtrim(dirname($_SERVER["SCRIPT_NAME"]), "/") ?>/data/plots_boundaries.geojson';
+    fetch(geojsonUrl)
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(geojson => {
+            L.geoJSON(geojson, {
+                style: feature => {
+                    const bt = feature.properties.ban_type;
+                    const colors = { 1: '#22c55e', 2: '#f59e0b', 3: '#ef4444' };
+                    return {
+                        color: colors[bt] || '#3b82f6',
+                        weight: 2,
+                        fillOpacity: 0.15,
+                        fillColor: colors[bt] || '#3b82f6',
+                    };
+                },
+                onEachFeature: (feature, layer) => {
+                    const p = feature.properties;
+                    const bt = feature.properties.ban_type;
+                    const bColors = { 1: '#22c55e', 2: '#f59e0b', 3: '#ef4444' };
+                    layer.bindPopup(plotPopupHtml({
+                        plotCode: p.plot_code,
+                        ownerName: p.owner || '',
+                        areaRai: p.area_rai,
+                        areaNgan: p.area_ngan,
+                        statusLabel: p.ptype || '-',
+                        statusColor: bColors[bt] || '#3b82f6',
+                        accentColor: bColors[bt] || '#3b82f6'
+                    }));
+                }
+            }).addTo(plotBoundaryLayer);
+        })
+        .catch(e => console.warn('ไม่สามารถโหลดขอบเขตแปลง:', e));
+    plotBoundaryLayer.addTo(map);
+
+    // ===== Base layers + Park boundary + Layer Control =====
+    addMapLayers(map, {
+        defaultBase: 'osm',
+        extraOverlays: { 'ขอบเขตแปลง': plotBoundaryLayer }
     });
-
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: '© Esri',
-        maxZoom: 19,
-    });
-
-    const topoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenTopoMap',
-        maxZoom: 17,
-    });
-
-    osmLayer.addTo(map);
-
-    L.control.layers({
-        'แผนที่ปกติ': osmLayer,
-        'ดาวเทียม': satelliteLayer,
-        'ภูมิประเทศ': topoLayer,
-    }, {
-        'ขอบเขตแปลง': (() => {
-            const boundaryLayer = L.layerGroup();
-            // Load GeoJSON
-            const geojsonUrl = '<?= rtrim(dirname($_SERVER["SCRIPT_NAME"]), "/") ?>/data/plots_boundaries.geojson';
-            console.log('Loading boundaries from:', geojsonUrl);
-            fetch(geojsonUrl)
-                .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-                .then(geojson => {
-                    console.log('Loaded', geojson.features.length, 'boundary polygons');
-                    const geoLayer = L.geoJSON(geojson, {
-                        style: feature => {
-                            const bt = feature.properties.ban_type;
-                            const colors = { 1: '#22c55e', 2: '#f59e0b', 3: '#ef4444' };
-                            return {
-                                color: colors[bt] || '#3b82f6',
-                                weight: 2,
-                                fillOpacity: 0.15,
-                                fillColor: colors[bt] || '#3b82f6',
-                            };
-                        },
-                        onEachFeature: (feature, layer) => {
-                            const p = feature.properties;
-                            layer.bindPopup(`
-                                <div style="font-family:Prompt; min-width:180px;">
-                                    <strong style="color:#1e40af;">${p.plot_code}</strong>
-                                    <hr style="margin:4px 0;border-color:#eee;">
-                                    <p style="margin:3px 0;"><b>เจ้าของ:</b> ${p.owner}</p>
-                                    <p style="margin:3px 0;"><b>พื้นที่:</b> ${p.area_rai} ไร่ ${p.area_ngan} งาน</p>
-                                    <p style="margin:3px 0;"><b>ประเภท:</b> ${p.ptype || '-'}</p>
-                                    <p style="margin:3px 0;"><b>อุทยาน:</b> ${p.park}</p>
-                                    ${p.remark ? `<p style="margin:3px 0;color:#6b7280;"><i>${p.remark}</i></p>` : ''}
-                                </div>
-                            `);
-                        }
-                    });
-                    geoLayer.addTo(boundaryLayer);
-                })
-                .catch(e => console.warn('ไม่สามารถโหลดขอบเขตแปลง:', e));
-            boundaryLayer.addTo(map); // Show by default
-            return boundaryLayer;
-        })()
-    }).addTo(map);
 
     // ===== Add Markers =====
     const markers = {};
@@ -233,18 +209,17 @@ $plotsJson = json_encode($allPlots, JSON_UNESCAPED_UNICODE);
         });
 
         const marker = L.marker([plot.latitude, plot.longitude], { icon })
-            .bindPopup(`
-            <div style="font-family:Prompt; min-width:200px;">
-                <strong style="color:${color}; font-size:15px;">${plot.plot_code}</strong>
-                <hr style="margin:6px 0; border-color:#eee;">
-                <p style="margin:4px 0;"><b>เจ้าของ:</b> ${plot.prefix || ''}${plot.first_name} ${plot.last_name}</p>
-                <p style="margin:4px 0;"><b>พื้นที่:</b> ${plot.area_rai} ไร่ ${plot.area_ngan} งาน ${plot.area_sqwa} วา</p>
-                <p style="margin:4px 0;"><b>การใช้:</b> ${landUseLabels[plot.land_use_type] || plot.land_use_type}</p>
-                <p style="margin:4px 0;"><b>สถานะ:</b> <span style="color:${color}; font-weight:600;">${statusLabels[plot.status] || plot.status}</span></p>
-                ${plot.plot_image_path ? `<img src="${plot.plot_image_path}" style="width:100%; margin-top:8px; border-radius:8px;">` : ''}
-                <a href="index.php?page=plots&action=view&id=${plot.plot_id}" style="display:block; margin-top:8px; color:#16a34a; font-weight:500;">ดูรายละเอียด →</a>
-            </div>
-        `);
+            .bindPopup(plotPopupHtml({
+                plotCode: plot.plot_code,
+                ownerName: (plot.prefix || '') + plot.first_name + ' ' + plot.last_name,
+                areaRai: plot.area_rai,
+                areaNgan: plot.area_ngan,
+                areaSqwa: plot.area_sqwa,
+                statusLabel: statusLabels[plot.status] || plot.status,
+                statusColor: color,
+                plotId: plot.plot_id,
+                accentColor: color
+            }));
 
         marker.addTo(markersGroup);
         markers[plot.plot_id] = { marker, data: plot };

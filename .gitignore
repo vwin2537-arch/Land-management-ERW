@@ -10,8 +10,9 @@ Thumbs.db
 /logs/
 /tmp/
 
-# Large data files (not needed in repo)
-/data/
+# Large data files (not needed in repo) — but keep GeoJSON overlays
+/data/*
+!/data/*.geojson
 
 # Shapefile source data (keep in separate storage)
 /ตรวจสอบคุณสมบัติ/
@@ -40,6 +41,13 @@ brain/
 
 # Logs
 *.log
+
+# Node.js (used for shapefile conversion)
+node_modules/
+package-lock.json
+
+# Shapefile source (large, keep in local storage)
+/MAP_ERW/
 
 # IDE
 .vscode/

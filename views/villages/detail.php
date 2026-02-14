@@ -57,8 +57,12 @@ $byStatus->execute(['name' => $name]);
 $statusData = $byStatus->fetchAll();
 
 // ข้อมูลแปลงสำหรับแผนที่ (ที่มีพิกัด)
-$mapStmt = $db->prepare("SELECT plot_id, plot_code, latitude, longitude, polygon_coords, status, area_rai, area_ngan
-    FROM land_plots WHERE par_ban = :name AND latitude IS NOT NULL AND longitude IS NOT NULL");
+$mapStmt = $db->prepare("SELECT lp.plot_id, lp.plot_code, lp.latitude, lp.longitude, lp.polygon_coords,
+           lp.status, lp.area_rai, lp.area_ngan, lp.area_sqwa,
+           CONCAT(IFNULL(v.prefix,''), v.first_name, ' ', v.last_name) AS owner_name
+    FROM land_plots lp
+    JOIN villagers v ON lp.villager_id = v.villager_id
+    WHERE lp.par_ban = :name AND lp.latitude IS NOT NULL AND lp.longitude IS NOT NULL");
 $mapStmt->execute(['name' => $name]);
 $mapPlots = $mapStmt->fetchAll();
 
@@ -254,14 +258,28 @@ const themeColor = '<?= $themeColor ?>';
 
 if (mapPlotsData.length > 0) {
     const vMap = L.map('villageMap').setView([mapPlotsData[0].latitude, mapPlotsData[0].longitude], 14);
-
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19, attribution: '© Esri'
-    }).addTo(vMap);
+    addMapLayers(vMap, { defaultBase: 'satellite' });
 
     const bounds = L.latLngBounds();
 
+    const statusColors = <?= json_encode(PLOT_STATUS_COLORS) ?>;
+    const statusLabels = <?= json_encode(PLOT_STATUS_LABELS) ?>;
+
     mapPlotsData.forEach(plot => {
+        const stColor = statusColors[plot.status] || '#6b7280';
+        const stLabel = statusLabels[plot.status] || plot.status;
+        const popupOpts = {
+            plotCode: plot.plot_code,
+            ownerName: plot.owner_name || '',
+            areaRai: plot.area_rai,
+            areaNgan: plot.area_ngan,
+            areaSqwa: plot.area_sqwa,
+            statusLabel: stLabel,
+            statusColor: stColor,
+            plotId: plot.plot_id,
+            accentColor: themeColor
+        };
+
         if (plot.polygon_coords) {
             try {
                 const coords = typeof plot.polygon_coords === 'string' ? JSON.parse(plot.polygon_coords) : plot.polygon_coords;
@@ -269,13 +287,17 @@ if (mapPlotsData.length > 0) {
                     const poly = L.polygon(coords, {
                         color: themeColor, weight: 2, fillOpacity: 0.25, fillColor: themeColor
                     }).addTo(vMap);
-                    poly.bindPopup(`<b>${plot.plot_code}</b><br>${plot.area_rai} ไร่ ${plot.area_ngan} งาน`);
+                    poly.bindPopup(plotPopupHtml(popupOpts));
                     bounds.extend(poly.getBounds());
                 }
             } catch (e) {}
         }
 
         if (plot.latitude && plot.longitude) {
+            const marker = L.circleMarker([plot.latitude, plot.longitude], {
+                radius: 5, color: '#fff', weight: 2, fillColor: themeColor, fillOpacity: 1
+            }).addTo(vMap);
+            marker.bindPopup(plotPopupHtml(popupOpts));
             bounds.extend([plot.latitude, plot.longitude]);
         }
     });

@@ -47,6 +47,7 @@ $initials = mb_substr($_SESSION['full_name'] ?? 'U', 0, 1, 'UTF-8');
         <!-- Leaflet.js for Map -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="assets/js/map-popup.js"></script>
     <?php endif; ?>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
